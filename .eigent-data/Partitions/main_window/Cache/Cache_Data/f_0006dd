@@ -1,0 +1,249 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/components/ChatBox/TaskBox/TaskItem.tsx");import __vite__cjsImport0_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=1511c1fe"; const jsxDEV = __vite__cjsImport0_react_jsxDevRuntime["jsxDEV"];
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScope;
+let prevRefreshReg;
+let prevRefreshSig;
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TaskItem.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+var _s = $RefreshSig$();
+import { Textarea } from "/src/components/ui/textarea.tsx";
+import { Check, CircleDashed, PenLine, Trash2 } from "/node_modules/.vite/deps/lucide-react.js?v=a73cf668";
+import __vite__cjsImport5_react from "/node_modules/.vite/deps/react.js?v=1511c1fe"; const useEffect = __vite__cjsImport5_react["useEffect"]; const useRef = __vite__cjsImport5_react["useRef"]; const useState = __vite__cjsImport5_react["useState"];
+import { useTranslation } from "/node_modules/.vite/deps/react-i18next.js?v=73e1f715";
+import { Button } from "/src/components/ui/button.tsx";
+export function TaskItem({
+  taskInfo,
+  taskIndex,
+  onUpdate,
+  onSave,
+  onDelete
+}) {
+  _s();
+  const { t } = useTranslation();
+  const [isFocus, setIsFocus] = useState(false);
+  const textareaRef = useRef(null);
+  const handleFocus = (e, isFocus2) => {
+    e.stopPropagation();
+    if (isFocus2) {
+      setIsFocus(true);
+      textareaRef.current?.focus();
+    } else {
+      setIsFocus(false);
+      textareaRef.current?.blur();
+    }
+  };
+  const adjustHeight = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  };
+  useEffect(() => {
+    adjustHeight();
+  }, [taskInfo.content]);
+  return /* @__PURE__ */ jsxDEV("div", { children: /* @__PURE__ */ jsxDEV(
+    "div",
+    {
+      onDoubleClick: (e) => handleFocus(e, true),
+      className: `group relative flex min-h-2 items-start rounded-lg border border-solid border-transparent p-sm hover:bg-task-fill-hover ${isFocus ? "border-task-border-focus-default bg-task-fill-default" : ""}`,
+      children: [
+        /* @__PURE__ */ jsxDEV("div", { className: "flex h-4 w-7 flex-shrink-0 cursor-pointer items-center justify-center pr-sm pt-1", children: taskInfo.id === "" ? /* @__PURE__ */ jsxDEV(CircleDashed, { size: 13, className: "text-icon-secondary" }, void 0, false, {
+          fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TaskItem.tsx",
+          lineNumber: 95,
+          columnNumber: 11
+        }, this) : /* @__PURE__ */ jsxDEV("div", { className: "h-2 w-2 rounded-full bg-icon-information" }, void 0, false, {
+          fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TaskItem.tsx",
+          lineNumber: 97,
+          columnNumber: 11
+        }, this) }, void 0, false, {
+          fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TaskItem.tsx",
+          lineNumber: 93,
+          columnNumber: 9
+        }, this),
+        /* @__PURE__ */ jsxDEV(
+          "div",
+          {
+            className: `relative flex min-h-4 w-full items-start border-[0px] border-b border-solid border-task-border-default pb-2 transition-all duration-300 group-hover:border-transparent`,
+            children: [
+              /* @__PURE__ */ jsxDEV(
+                Textarea,
+                {
+                  ref: textareaRef,
+                  placeholder: t("layout.add-new-task"),
+                  className: `${isFocus && "w-[calc(100%-52px)]"} min-h-2 resize-none overflow-hidden rounded-none border-none bg-transparent p-0 text-xs leading-[20px] shadow-none ring-0 focus-visible:ring-0 focus-visible:ring-offset-0`,
+                  value: taskInfo.content,
+                  onChange: (e) => onUpdate(e.target.value),
+                  onBlur: () => {
+                    setTimeout(() => {
+                      onSave();
+                      setIsFocus(false);
+                    }, 100);
+                  },
+                  rows: 1
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TaskItem.tsx",
+                  lineNumber: 103,
+                  columnNumber: 11
+                },
+                this
+              ),
+              !isFocus && /* @__PURE__ */ jsxDEV("div", { className: "absolute inset-0 h-full w-full bg-transparent" }, void 0, false, {
+                fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TaskItem.tsx",
+                lineNumber: 120,
+                columnNumber: 11
+              }, this)
+            ]
+          },
+          void 0,
+          true,
+          {
+            fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TaskItem.tsx",
+            lineNumber: 100,
+            columnNumber: 9
+          },
+          this
+        ),
+        /* @__PURE__ */ jsxDEV(
+          "div",
+          {
+            className: `absolute right-2 top-2 flex items-center gap-xs group-hover:opacity-100 ${isFocus ? "opacity-100" : "opacity-0"} transition-opacity duration-300`,
+            children: [
+              !isFocus ? /* @__PURE__ */ jsxDEV(
+                Button,
+                {
+                  onClick: (e) => handleFocus(e, true),
+                  className: "rounded-full",
+                  variant: "outline",
+                  size: "icon",
+                  children: /* @__PURE__ */ jsxDEV(PenLine, { size: 16, className: "" }, void 0, false, {
+                    fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TaskItem.tsx",
+                    lineNumber: 135,
+                    columnNumber: 15
+                  }, this)
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TaskItem.tsx",
+                  lineNumber: 129,
+                  columnNumber: 11
+                },
+                this
+              ) : /* @__PURE__ */ jsxDEV(
+                Button,
+                {
+                  onClick: (e) => {
+                    onSave();
+                    handleFocus(e, false);
+                  },
+                  className: "rounded-full",
+                  variant: "success",
+                  size: "icon",
+                  children: /* @__PURE__ */ jsxDEV(
+                    Check,
+                    {
+                      size: 16,
+                      className: "text-button-fill-success-foreground"
+                    },
+                    void 0,
+                    false,
+                    {
+                      fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TaskItem.tsx",
+                      lineNumber: 147,
+                      columnNumber: 15
+                    },
+                    this
+                  )
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TaskItem.tsx",
+                  lineNumber: 138,
+                  columnNumber: 11
+                },
+                this
+              ),
+              /* @__PURE__ */ jsxDEV(
+                Button,
+                {
+                  onClick: () => onDelete(),
+                  className: "rounded-full",
+                  variant: "cuation",
+                  size: "icon",
+                  children: /* @__PURE__ */ jsxDEV(Trash2, { size: 16, className: "text-icon-tertiary" }, void 0, false, {
+                    fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TaskItem.tsx",
+                    lineNumber: 159,
+                    columnNumber: 13
+                  }, this)
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TaskItem.tsx",
+                  lineNumber: 153,
+                  columnNumber: 11
+                },
+                this
+              )
+            ]
+          },
+          void 0,
+          true,
+          {
+            fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TaskItem.tsx",
+            lineNumber: 123,
+            columnNumber: 9
+          },
+          this
+        )
+      ]
+    },
+    void 0,
+    true,
+    {
+      fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TaskItem.tsx",
+      lineNumber: 87,
+      columnNumber: 7
+    },
+    this
+  ) }, `task-item-${taskIndex}`, false, {
+    fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TaskItem.tsx",
+    lineNumber: 86,
+    columnNumber: 5
+  }, this);
+}
+_s(TaskItem, "dQKz3PFxqdZHPn6GS1GIxYveQ8M=", false, function() {
+  return [useTranslation];
+});
+_c = TaskItem;
+var _c;
+$RefreshReg$(_c, "TaskItem");
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TaskItem.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TaskItem.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,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UyxJQUFoQztBQUFBO0FBQUE7QUFBQTtBQUFBLFNBNkVBO0FBRUo7QUFBQ0ksR0FsSGVOLFVBQVE7QUFBQSxVQU9SRixjQUFjO0FBQUE7QUFBQSxLQVBkRTtBQUFRLElBQUEwQjtBQUFBLGFBQUFBLElBQUEiLCJuYW1lcyI6WyJUZXh0YXJlYSIsIkNoZWNrIiwiQ2lyY2xlRGFzaGVkIiwiUGVuTGluZSIsIlRyYXNoMiIsInVzZUVmZmVjdCIsInVzZVJlZiIsInVzZVN0YXRlIiwidXNlVHJhbnNsYXRpb24iLCJCdXR0b24iLCJUYXNrSXRlbSIsInRhc2tJbmZvIiwidGFza0luZGV4Iiwib25VcGRhdGUiLCJvblNhdmUiLCJvbkRlbGV0ZSIsIl9zIiwidCIsImlzRm9jdXMiLCJzZXRJc0ZvY3VzIiwidGV4dGFyZWFSZWYiLCJoYW5kbGVGb2N1cyIsImUiLCJzdG9wUHJvcGFnYXRpb24iLCJjdXJyZW50IiwiZm9jdXMiLCJibHVyIiwiYWRqdXN0SGVpZ2h0Iiwic3R5bGUiLCJoZWlnaHQiLCJzY3JvbGxIZWlnaHQiLCJjb250ZW50IiwiaWQiLCJ0YXJnZXQiLCJ2YWx1ZSIsInNldFRpbWVvdXQiLCJfYyJdLCJpZ25vcmVMaXN0IjpbXSwic291cmNlcyI6WyJUYXNrSXRlbS50c3giXSwic291cmNlc0NvbnRlbnQiOlsiLy8gPT09PT09PT09IENvcHlyaWdodCAyMDI1LTIwMjYgQCBlaWdlbnQuYWkgQWxsIFJpZ2h0cyBSZXNlcnZlZC4gPT09PT09PT09XG4vLyBMaWNlbnNlZCB1bmRlciB0aGUgQXBhY2hlIExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgXCJMaWNlbnNlXCIpO1xuLy8geW91IG1heSBub3QgdXNlIHRoaXMgZmlsZSBleGNlcHQgaW4gY29tcGxpYW5jZSB3aXRoIHRoZSBMaWNlbnNlLlxuLy8gWW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0XG4vL1xuLy8gICAgIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMFxuLy9cbi8vIFVubGVzcyByZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4gd3JpdGluZywgc29mdHdhcmVcbi8vIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFuIFwiQVMgSVNcIiBCQVNJUyxcbi8vIFdJVEhPVVQgV0FSUkFOVElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBsaWVkLlxuLy8gU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5nIHBlcm1pc3Npb25zIGFuZFxuLy8gbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuXG4vLyA9PT09PT09PT0gQ29weXJpZ2h0IDIwMjUtMjAyNiBAIGVpZ2VudC5haSBBbGwgUmlnaHRzIFJlc2VydmVkLiA9PT09PT09PT1cblxuaW1wb3J0IHsgVGV4dGFyZWEgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvdGV4dGFyZWEnO1xuaW1wb3J0IHsgQ2hlY2ssIENpcmNsZURhc2hlZCwgUGVuTGluZSwgVHJhc2gyIH0gZnJvbSAnbHVjaWRlLXJlYWN0JztcbmltcG9ydCB7IHVzZUVmZmVjdCwgdXNlUmVmLCB1c2VTdGF0ZSB9IGZyb20gJ3JlYWN0JztcbmltcG9ydCB7IHVzZVRyYW5zbGF0aW9uIH0gZnJvbSAncmVhY3QtaTE4bmV4dCc7XG5pbXBvcnQgeyBCdXR0b24gfSBmcm9tICcuLi8uLi91aS9idXR0b24nO1xuXG5pbnRlcmZhY2UgVGFza0l0ZW1Qcm9wcyB7XG4gIHRhc2tJbmZvOiB7XG4gICAgaWQ6IHN0cmluZztcbiAgICBjb250ZW50OiBzdHJpbmc7XG4gIH07XG4gIHRhc2tJbmRleDogbnVtYmVyO1xuICBvblVwZGF0ZTogKGNvbnRlbnQ6IHN0cmluZykgPT4gdm9pZDtcbiAgb25TYXZlOiAoKSA9PiB2b2lkO1xuICBvbkRlbGV0ZTogKCkgPT4gdm9pZDtcbn1cblxuZXhwb3J0IGZ1bmN0aW9uIFRhc2tJdGVtKHtcbiAgdGFza0luZm8sXG4gIHRhc2tJbmRleCxcbiAgb25VcGRhdGUsXG4gIG9uU2F2ZSxcbiAgb25EZWxldGUsXG59OiBUYXNrSXRlbVByb3BzKSB7XG4gIGNvbnN0IHsgdCB9ID0gdXNlVHJhbnNsYXRpb24oKTtcbiAgY29uc3QgW2lzRm9jdXMsIHNldElzRm9jdXNdID0gdXNlU3RhdGUoZmFsc2UpO1xuICBjb25zdCB0ZXh0YXJlYVJlZiA9IHVzZVJlZjxIVE1MVGV4dEFyZWFFbGVtZW50PihudWxsKTtcbiAgY29uc3QgaGFuZGxlRm9jdXMgPSAoZTogUmVhY3QuTW91c2VFdmVudDxhbnk+LCBpc0ZvY3VzOiBib29sZWFuKSA9PiB7XG4gICAgZS5zdG9wUHJvcGFnYXRpb24oKTtcbiAgICBpZiAoaXNGb2N1cykge1xuICAgICAgc2V0SXNGb2N1cyh0cnVlKTtcbiAgICAgIHRleHRhcmVhUmVmLmN1cnJlbnQ/LmZvY3VzKCk7XG4gICAgfSBlbHNlIHtcbiAgICAgIHNldElzRm9jdXMoZmFsc2UpO1xuICAgICAgdGV4dGFyZWFSZWYuY3VycmVudD8uYmx1cigpO1xuICAgIH1cbiAgfTtcblxuICAvLyBhdXRvIGFkanVzdCBoZWlnaHRcbiAgY29uc3QgYWRqdXN0SGVpZ2h0ID0gKCkgPT4ge1xuICAgIGlmICh0ZXh0YXJlYVJlZi5jdXJyZW50KSB7XG4gICAgICB0ZXh0YXJlYVJlZi5jdXJyZW50LnN0eWxlLmhlaWdodCA9ICdhdXRvJztcbiAgICAgIHRleHRhcmVhUmVmLmN1cnJlbnQuc3R5bGUuaGVpZ2h0ID0gYCR7dGV4dGFyZWFSZWYuY3VycmVudC5zY3JvbGxIZWlnaHR9cHhgO1xuICAgIH1cbiAgfTtcblxuICAvLyB3aGVuIGNvbnRlbnQgY2hhbmdlcywgYWRqdXN0IGhlaWdodFxuICB1c2VFZmZlY3QoKCkgPT4ge1xuICAgIGFkanVzdEhlaWdodCgpO1xuICB9LCBbdGFza0luZm8uY29udGVudF0pO1xuXG4gIHJldHVybiAoXG4gICAgPGRpdiBrZXk9e2B0YXNrLWl0ZW0tJHt0YXNrSW5kZXh9YH0+XG4gICAgICA8ZGl2XG4gICAgICAgIG9uRG91YmxlQ2xpY2s9eyhlKSA9PiBoYW5kbGVGb2N1cyhlLCB0cnVlKX1cbiAgICAgICAgY2xhc3NOYW1lPXtgZ3JvdXAgcmVsYXRpdmUgZmxleCBtaW4taC0yIGl0ZW1zLXN0YXJ0IHJvdW5kZWQtbGcgYm9yZGVyIGJvcmRlci1zb2xpZCBib3JkZXItdHJhbnNwYXJlbnQgcC1zbSBob3ZlcjpiZy10YXNrLWZpbGwtaG92ZXIgJHtcbiAgICAgICAgICBpc0ZvY3VzID8gJ2JvcmRlci10YXNrLWJvcmRlci1mb2N1cy1kZWZhdWx0IGJnLXRhc2stZmlsbC1kZWZhdWx0JyA6ICcnXG4gICAgICAgIH1gfVxuICAgICAgPlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaC00IHctNyBmbGV4LXNocmluay0wIGN1cnNvci1wb2ludGVyIGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWNlbnRlciBwci1zbSBwdC0xXCI+XG4gICAgICAgICAge3Rhc2tJbmZvLmlkID09PSAnJyA/IChcbiAgICAgICAgICAgIDxDaXJjbGVEYXNoZWQgc2l6ZT17MTN9IGNsYXNzTmFtZT1cInRleHQtaWNvbi1zZWNvbmRhcnlcIiAvPlxuICAgICAgICAgICkgOiAoXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImgtMiB3LTIgcm91bmRlZC1mdWxsIGJnLWljb24taW5mb3JtYXRpb25cIj48L2Rpdj5cbiAgICAgICAgICApfVxuICAgICAgICA8L2Rpdj5cbiAgICAgICAgPGRpdlxuICAgICAgICAgIGNsYXNzTmFtZT17YHJlbGF0aXZlIGZsZXggbWluLWgtNCB3LWZ1bGwgaXRlbXMtc3RhcnQgYm9yZGVyLVswcHhdIGJvcmRlci1iIGJvcmRlci1zb2xpZCBib3JkZXItdGFzay1ib3JkZXItZGVmYXVsdCBwYi0yIHRyYW5zaXRpb24tYWxsIGR1cmF0aW9uLTMwMCBncm91cC1ob3Zlcjpib3JkZXItdHJhbnNwYXJlbnRgfVxuICAgICAgICA+XG4gICAgICAgICAgPFRleHRhcmVhXG4gICAgICAgICAgICByZWY9e3RleHRhcmVhUmVmfVxuICAgICAgICAgICAgcGxhY2Vob2xkZXI9e3QoJ2xheW91dC5hZGQtbmV3LXRhc2snKX1cbiAgICAgICAgICAgIGNsYXNzTmFtZT17YCR7XG4gICAgICAgICAgICAgIGlzRm9jdXMgJiYgJ3ctW2NhbGMoMTAwJS01MnB4KV0nXG4gICAgICAgICAgICB9IG1pbi1oLTIgcmVzaXplLW5vbmUgb3ZlcmZsb3ctaGlkZGVuIHJvdW5kZWQtbm9uZSBib3JkZXItbm9uZSBiZy10cmFuc3BhcmVudCBwLTAgdGV4dC14cyBsZWFkaW5nLVsyMHB4XSBzaGFkb3ctbm9uZSByaW5nLTAgZm9jdXMtdmlzaWJsZTpyaW5nLTAgZm9jdXMtdmlzaWJsZTpyaW5nLW9mZnNldC0wYH1cbiAgICAgICAgICAgIHZhbHVlPXt0YXNrSW5mby5jb250ZW50fVxuICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiBvblVwZGF0ZShlLnRhcmdldC52YWx1ZSl9XG4gICAgICAgICAgICBvbkJsdXI9eygpID0+IHtcbiAgICAgICAgICAgICAgc2V0VGltZW91dCgoKSA9PiB7XG4gICAgICAgICAgICAgICAgb25TYXZlKCk7XG4gICAgICAgICAgICAgICAgc2V0SXNGb2N1cyhmYWxzZSk7XG4gICAgICAgICAgICAgIH0sIDEwMCk7XG4gICAgICAgICAgICB9fVxuICAgICAgICAgICAgcm93cz17MX1cbiAgICAgICAgICAvPlxuICAgICAgICAgIHshaXNGb2N1cyAmJiAoXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImFic29sdXRlIGluc2V0LTAgaC1mdWxsIHctZnVsbCBiZy10cmFuc3BhcmVudFwiPjwvZGl2PlxuICAgICAgICAgICl9XG4gICAgICAgIDwvZGl2PlxuICAgICAgICA8ZGl2XG4gICAgICAgICAgY2xhc3NOYW1lPXtgYWJzb2x1dGUgcmlnaHQtMiB0b3AtMiBmbGV4IGl0ZW1zLWNlbnRlciBnYXAteHMgZ3JvdXAtaG92ZXI6b3BhY2l0eS0xMDAgJHtcbiAgICAgICAgICAgIGlzRm9jdXMgPyAnb3BhY2l0eS0xMDAnIDogJ29wYWNpdHktMCdcbiAgICAgICAgICB9IHRyYW5zaXRpb24tb3BhY2l0eSBkdXJhdGlvbi0zMDBgfVxuICAgICAgICA+XG4gICAgICAgICAgeyFpc0ZvY3VzID8gKFxuICAgICAgICAgICAgPEJ1dHRvblxuICAgICAgICAgICAgICBvbkNsaWNrPXsoZSkgPT4gaGFuZGxlRm9jdXMoZSwgdHJ1ZSl9XG4gICAgICAgICAgICAgIGNsYXNzTmFtZT1cInJvdW5kZWQtZnVsbFwiXG4gICAgICAgICAgICAgIHZhcmlhbnQ9XCJvdXRsaW5lXCJcbiAgICAgICAgICAgICAgc2l6ZT1cImljb25cIlxuICAgICAgICAgICAgPlxuICAgICAgICAgICAgICA8UGVuTGluZSBzaXplPXsxNn0gY2xhc3NOYW1lPVwiXCIgLz5cbiAgICAgICAgICAgIDwvQnV0dG9uPlxuICAgICAgICAgICkgOiAoXG4gICAgICAgICAgICA8QnV0dG9uXG4gICAgICAgICAgICAgIG9uQ2xpY2s9eyhlKSA9PiB7XG4gICAgICAgICAgICAgICAgb25TYXZlKCk7XG4gICAgICAgICAgICAgICAgaGFuZGxlRm9jdXMoZSwgZmFsc2UpO1xuICAgICAgICAgICAgICB9fVxuICAgICAgICAgICAgICBjbGFzc05hbWU9XCJyb3VuZGVkLWZ1bGxcIlxuICAgICAgICAgICAgICB2YXJpYW50PVwic3VjY2Vzc1wiXG4gICAgICAgICAgICAgIHNpemU9XCJpY29uXCJcbiAgICAgICAgICAgID5cbiAgICAgICAgICAgICAgPENoZWNrXG4gICAgICAgICAgICAgICAgc2l6ZT17MTZ9XG4gICAgICAgICAgICAgICAgY2xhc3NOYW1lPVwidGV4dC1idXR0b24tZmlsbC1zdWNjZXNzLWZvcmVncm91bmRcIlxuICAgICAgICAgICAgICAvPlxuICAgICAgICAgICAgPC9CdXR0b24+XG4gICAgICAgICAgKX1cbiAgICAgICAgICA8QnV0dG9uXG4gICAgICAgICAgICBvbkNsaWNrPXsoKSA9PiBvbkRlbGV0ZSgpfVxuICAgICAgICAgICAgY2xhc3NOYW1lPVwicm91bmRlZC1mdWxsXCJcbiAgICAgICAgICAgIHZhcmlhbnQ9XCJjdWF0aW9uXCJcbiAgICAgICAgICAgIHNpemU9XCJpY29uXCJcbiAgICAgICAgICA+XG4gICAgICAgICAgICA8VHJhc2gyIHNpemU9ezE2fSBjbGFzc05hbWU9XCJ0ZXh0LWljb24tdGVydGlhcnlcIiAvPlxuICAgICAgICAgIDwvQnV0dG9uPlxuICAgICAgICA8L2Rpdj5cbiAgICAgIDwvZGl2PlxuICAgIDwvZGl2PlxuICApO1xufVxuXHJcblxyXG4iXSwiZmlsZSI6IkM6L1VzZXJzL1VzZXIvRGVza3RvcC9QUk9ZRUNUTy1SSVNLQ0FSRS9SSVNDQVJFL2VpZ2VudC1tYWluL3NyYy9jb21wb25lbnRzL0NoYXRCb3gvVGFza0JveC9UYXNrSXRlbS50c3gifQ==

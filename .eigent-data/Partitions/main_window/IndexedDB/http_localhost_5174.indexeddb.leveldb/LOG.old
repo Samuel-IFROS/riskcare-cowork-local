@@ -1,0 +1,14 @@
+2026/02/23-12:05:33.114 789c Reusing MANIFEST C:\Users\User\Desktop\PROYECTO-RISKCARE\RISCARE\eigent-main\.eigent-data\Partitions\main_window\IndexedDB\http_localhost_5174.indexeddb.leveldb/MANIFEST-000001
+2026/02/23-12:05:33.115 789c Recovering log #17
+2026/02/23-12:05:33.116 789c Reusing old log C:\Users\User\Desktop\PROYECTO-RISKCARE\RISCARE\eigent-main\.eigent-data\Partitions\main_window\IndexedDB\http_localhost_5174.indexeddb.leveldb/000017.log 
+2026/02/23-12:05:33.131 789c Level-0 table #22: started
+2026/02/23-12:05:33.146 789c Level-0 table #22: 682 bytes OK
+2026/02/23-12:05:33.148 789c Delete type=0 #17
+2026/02/23-12:05:33.148 ca28 Manual compaction at level-0 from '\x00\x08\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x09\x00\x00\x00' @ 0 : 0; will stop at '\x00\x08\x00\x00\x05' @ 200 : 1
+2026/02/23-12:05:33.148 ca28 Compacting 1@0 + 1@1 files
+2026/02/23-12:05:33.165 ca28 Generated table #23@0: 13 keys, 479 bytes
+2026/02/23-12:05:33.165 ca28 Compacted 1@0 + 1@1 files => 479 bytes
+2026/02/23-12:05:33.166 ca28 compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/02/23-12:05:33.166 ca28 Delete type=2 #22
+2026/02/23-12:05:33.167 ca28 Manual compaction at level-0 from '\x00\x08\x00\x00\x05' @ 200 : 1 .. '\x00\x09\x00\x00\x00' @ 0 : 0; will stop at (end)
+2026/02/23-12:05:56.925 789c Manual compaction at level-0 from '\x00\x09\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x0a\x00\x00\x00' @ 0 : 0; will stop at (end)

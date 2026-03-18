@@ -1,0 +1,7 @@
+2026/03/02-09:28:19.006 8dac Reusing MANIFEST C:\Users\User\Desktop\PROYECTO-RISKCARE\RISCARE\eigent-main\.eigent-data\Partitions\main_window\IndexedDB\http_localhost_5173.indexeddb.leveldb/MANIFEST-000001
+2026/03/02-09:28:19.006 8dac Recovering log #140
+2026/03/02-09:28:19.007 8dac Reusing old log C:\Users\User\Desktop\PROYECTO-RISKCARE\RISCARE\eigent-main\.eigent-data\Partitions\main_window\IndexedDB\http_localhost_5173.indexeddb.leveldb/000140.log 
+2026/03/02-09:28:19.020 81d4 Level-0 table #146: started
+2026/03/02-09:28:19.031 81d4 Level-0 table #146: 460 bytes OK
+2026/03/02-09:28:19.033 81d4 Delete type=0 #140
+2026/03/02-09:28:19.033 3564 Manual compaction at level-0 from '\x002\x00\x00\x00' @ 72057594037927935 : 1 .. '\x003\x00\x00\x00' @ 0 : 0; will stop at (end)

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<!-- Content Security Policy: CDN allowlist for agent-generated HTML -->
+		<meta
+			http-equiv="Content-Security-Policy"
+			content="
+				script-src 'self' 'unsafe-inline' 'unsafe-eval'
+					https://cdn.amplitude.com
+					https://cdnjs.cloudflare.com
+					https://cdn.jsdelivr.net
+					https://unpkg.com
+					https://ajax.googleapis.com
+					https://code.jquery.com
+					https://stackpath.bootstrapcdn.com
+					https://cdn.tailwindcss.com
+					https://cdn.plot.ly
+					https://d3js.org
+					https://cdn.datatables.net
+					https://cdn.chart.js
+					https://cdn.canvasjs.com
+					https://cdn.amcharts.com
+					https://threejs.org
+					https://pixijs.download
+					https://cdn.babylonjs.com
+					https://aframe.io
+					https://cesium.com
+					https://cdn.lottiefiles.com
+					https://cdn.socket.io
+					https://cdn.firebase.com
+					https://maps.googleapis.com
+					https://api.mapbox.com
+					https://cdn.tiny.cloud
+					https://cdn.ckeditor.com
+					https://cdn.quilljs.com
+					https://cdn.mathjax.org
+					https://cdn.ethers.io
+					https://cdn.auth0.com
+					https://cdn.plyr.io
+					https://vjs.zencdn.net
+					https://cdn.dashjs.org
+					https://cdn.npmmirror.com
+					https://registry.npmmirror.com;
+				worker-src 'self' blob:;
+				child-src 'self' blob:;
+				frame-src 'self' localfile: blob: data:;
+			"
+		/>
+		<script>
+			(function () {
+				const isElectron =
+					typeof navigator !== 'undefined' &&
+					navigator.userAgent.toLowerCase().includes('electron');
+				const envAnalyticsEnabled = '%VITE_ENABLE_ANALYTICS%' === 'true';
+				const localAnalyticsEnabled = (() => {
+					try {
+						return localStorage.getItem('riskcare.analytics.enabled') === 'true';
+					} catch (_error) {
+						return false;
+					}
+				})();
+				if (isElectron || (!envAnalyticsEnabled && !localAnalyticsEnabled)) return;
+				if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
+
+				const loadScript = (src) =>
+					new Promise((resolve, reject) => {
+						const script = document.createElement('script');
+						script.src = src;
+						script.async = true;
+						script.onload = resolve;
+						script.onerror = reject;
+						document.head.appendChild(script);
+					});
+
+				Promise.all([
+					loadScript('https://cdn.amplitude.com/libs/analytics-browser-2.11.1-min.js.gz'),
+					loadScript('https://cdn.amplitude.com/libs/plugin-session-replay-browser-1.8.0-min.js.gz'),
+				])
+					.then(() => {
+						const replayPlugin = window.sessionReplay?.plugin?.({ sampleRate: 1 });
+						if (replayPlugin) {
+							window.amplitude?.add?.(replayPlugin);
+						}
+						const logLevelNone = window.amplitude?.Types?.LogLevel?.None;
+						window.amplitude?.init?.('87ce6adbb14b24ffe1703d18bf405e40', {
+							autocapture: { elementInteractions: true },
+							logLevel: typeof logLevelNone === 'number' ? logLevelNone : 0,
+						});
+					})
+					.catch(() => {
+						// Intentionally ignore analytics bootstrap errors.
+					});
+			})();
+		</script>
+		<script>
+			(function () {
+				try {
+					const authStorage = localStorage.getItem('auth-storage');
+					const parsed = authStorage ? JSON.parse(authStorage) : null;
+					const appearance = parsed?.state?.appearance || 'dark';
+					const theme = appearance === 'transparent' ? 'transparent' : appearance === 'light' ? 'light' : 'dark';
+					document.documentElement.setAttribute('data-theme', theme);
+				} catch (_error) {
+					document.documentElement.setAttribute('data-theme', 'dark');
+				}
+			})();
+		</script>
+		<title>Riskcare cowork</title>
+	</head>
+	<body>
+		<div id="root"></div>
+		<script type="module" src="/src/main.tsx"></script>
+	</body>
+</html>
+
+

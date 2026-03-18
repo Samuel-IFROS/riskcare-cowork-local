@@ -1,0 +1,253 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx");import __vite__cjsImport0_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=1511c1fe"; const jsxDEV = __vite__cjsImport0_react_jsxDevRuntime["jsxDEV"];
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScope;
+let prevRefreshReg;
+let prevRefreshSig;
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+var _s = $RefreshSig$();
+import { Button } from "/src/components/ui/button.tsx";
+import { Progress } from "/src/components/ui/progress.tsx";
+import { ChevronDown, LoaderCircle } from "/node_modules/.vite/deps/lucide-react.js?v=a73cf668";
+import { useTranslation } from "/node_modules/.vite/deps/react-i18next.js?v=73e1f715";
+import { TaskType } from "/src/components/ChatBox/TaskBox/TaskType.tsx";
+export const TypeCardSkeleton = ({
+  isTakeControl
+}) => {
+  _s();
+  const { t } = useTranslation();
+  return /* @__PURE__ */ jsxDEV("div", { children: /* @__PURE__ */ jsxDEV("div", { className: "flex h-auto w-full flex-col gap-2 py-sm pl-2 transition-all duration-300", children: /* @__PURE__ */ jsxDEV("div", { className: "relative h-auto w-full overflow-hidden rounded-xl bg-task-surface py-sm backdrop-blur-[5px]", children: [
+    /* @__PURE__ */ jsxDEV("div", { className: "absolute left-0 top-0 w-full bg-transparent", children: /* @__PURE__ */ jsxDEV(Progress, { value: 100, className: "h-[2px] w-full" }, void 0, false, {
+      fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+      lineNumber: 51,
+      columnNumber: 13
+    }, this) }, void 0, false, {
+      fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+      lineNumber: 50,
+      columnNumber: 11
+    }, this),
+    /* @__PURE__ */ jsxDEV("div", { className: "mb-2.5 flex flex-col gap-sm px-sm text-sm font-bold leading-13", children: [
+      /* @__PURE__ */ jsxDEV(
+        "div",
+        {
+          className: `h-5 w-full rounded-full bg-fill-skeloten-default ${!isTakeControl ? "animate-pulse" : ""}`
+        },
+        void 0,
+        false,
+        {
+          fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+          lineNumber: 54,
+          columnNumber: 13
+        },
+        this
+      ),
+      /* @__PURE__ */ jsxDEV(
+        "div",
+        {
+          className: `h-5 w-1/2 rounded-full bg-fill-skeloten-default ${!isTakeControl ? "animate-pulse" : ""}`
+        },
+        void 0,
+        false,
+        {
+          fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+          lineNumber: 59,
+          columnNumber: 13
+        },
+        this
+      ),
+      /* @__PURE__ */ jsxDEV(
+        "div",
+        {
+          className: `h-5 w-1/2 rounded-full bg-fill-skeloten-default ${!isTakeControl ? "animate-pulse" : ""}`
+        },
+        void 0,
+        false,
+        {
+          fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+          lineNumber: 64,
+          columnNumber: 13
+        },
+        this
+      )
+    ] }, void 0, true, {
+      fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+      lineNumber: 53,
+      columnNumber: 11
+    }, this),
+    /* @__PURE__ */ jsxDEV("div", { className: `flex items-center justify-between gap-2 px-sm`, children: [
+      /* @__PURE__ */ jsxDEV("div", { className: "flex items-center gap-2", children: /* @__PURE__ */ jsxDEV(TaskType, { type: 1 }, void 0, false, {
+        fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+        lineNumber: 73,
+        columnNumber: 15
+      }, this) }, void 0, false, {
+        fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+        lineNumber: 72,
+        columnNumber: 13
+      }, this),
+      /* @__PURE__ */ jsxDEV("div", { className: "transition-all duration-300 ease-in-out", children: /* @__PURE__ */ jsxDEV("div", { className: "flex items-center gap-2 duration-300 animate-in fade-in-0 slide-in-from-right-2", children: [
+        /* @__PURE__ */ jsxDEV("div", { className: "text-xs font-medium leading-17 text-text-tertiary", children: t("layout.tasks") }, void 0, false, {
+          fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+          lineNumber: 78,
+          columnNumber: 17
+        }, this),
+        /* @__PURE__ */ jsxDEV(Button, { variant: "ghost", size: "icon", children: /* @__PURE__ */ jsxDEV(
+          ChevronDown,
+          {
+            size: 16,
+            className: `rotate-180 transition-transform duration-300`
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+            lineNumber: 82,
+            columnNumber: 19
+          },
+          this
+        ) }, void 0, false, {
+          fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+          lineNumber: 81,
+          columnNumber: 17
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+        lineNumber: 77,
+        columnNumber: 15
+      }, this) }, void 0, false, {
+        fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+        lineNumber: 76,
+        columnNumber: 13
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+      lineNumber: 71,
+      columnNumber: 11
+    }, this),
+    /* @__PURE__ */ jsxDEV("div", { className: "relative", children: /* @__PURE__ */ jsxDEV("div", { className: "overflow-hidden transition-all duration-300 ease-in-out", children: /* @__PURE__ */ jsxDEV("div", { className: "mt-sm flex flex-col gap-2 px-2", children: [1, 2, 3, 4].map((task) => {
+      return /* @__PURE__ */ jsxDEV(
+        "div",
+        {
+          className: `flex cursor-pointer gap-2 rounded-lg border border-solid border-transparent bg-task-fill-default px-sm py-sm transition-all duration-300 ease-in-out animate-in fade-in-0 slide-in-from-left-2`,
+          children: [
+            /* @__PURE__ */ jsxDEV("div", { className: "pt-0.5", children: /* @__PURE__ */ jsxDEV(
+              LoaderCircle,
+              {
+                size: 16,
+                className: `text-icon-success ${!isTakeControl ? "animate-spin" : ""}`
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+                lineNumber: 100,
+                columnNumber: 25
+              },
+              this
+            ) }, void 0, false, {
+              fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+              lineNumber: 99,
+              columnNumber: 23
+            }, this),
+            /* @__PURE__ */ jsxDEV("div", { className: "flex flex-1 flex-col items-start justify-center gap-sm", children: [
+              /* @__PURE__ */ jsxDEV(
+                "div",
+                {
+                  className: `h-5 w-full rounded-full bg-fill-skeloten-default text-sm font-medium leading-13 ${!isTakeControl ? "animate-pulse" : ""}`
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+                  lineNumber: 108,
+                  columnNumber: 25
+                },
+                this
+              ),
+              /* @__PURE__ */ jsxDEV(
+                "div",
+                {
+                  className: `h-5 w-1/3 rounded-full bg-fill-skeloten-default text-sm font-medium leading-13 ${!isTakeControl ? "animate-pulse" : ""}`
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+                  lineNumber: 113,
+                  columnNumber: 25
+                },
+                this
+              )
+            ] }, void 0, true, {
+              fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+              lineNumber: 107,
+              columnNumber: 23
+            }, this)
+          ]
+        },
+        `taskList-${task}`,
+        true,
+        {
+          fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+          lineNumber: 95,
+          columnNumber: 21
+        },
+        this
+      );
+    }) }, void 0, false, {
+      fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+      lineNumber: 92,
+      columnNumber: 15
+    }, this) }, void 0, false, {
+      fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+      lineNumber: 91,
+      columnNumber: 13
+    }, this) }, void 0, false, {
+      fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+      lineNumber: 90,
+      columnNumber: 11
+    }, this)
+  ] }, void 0, true, {
+    fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+    lineNumber: 49,
+    columnNumber: 9
+  }, this) }, void 0, false, {
+    fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+    lineNumber: 48,
+    columnNumber: 7
+  }, this) }, void 0, false, {
+    fileName: "C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx",
+    lineNumber: 47,
+    columnNumber: 5
+  }, this);
+};
+_s(TypeCardSkeleton, "zlIdU9EjM2llFt74AbE2KsUJXyM=", false, function() {
+  return [useTranslation];
+});
+_c = TypeCardSkeleton;
+var _c;
+$RefreshReg$(_c, "TypeCardSkeleton");
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/User/Desktop/PROYECTO-RISKCARE/RISCARE/eigent-main/src/components/ChatBox/TaskBox/TypeCardSkeleton.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,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dUJBQUMsU0FBSSxXQUFVLDBEQUNiO0FBQUE7QUFBQSxnQkFBQztBQUFBO0FBQUEsa0JBQ0MsV0FBVyxtRkFDVCxDQUFDQSxnQkFBZ0Isa0JBQWtCLEVBQUU7QUFBQTtBQUFBLGdCQUZ6QztBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUEsY0FJQztBQUFBLGNBQ0Q7QUFBQSxnQkFBQztBQUFBO0FBQUEsa0JBQ0MsV0FBVyxrRkFDVCxDQUFDQSxnQkFBZ0Isa0JBQWtCLEVBQUU7QUFBQTtBQUFBLGdCQUZ6QztBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUEsY0FJQztBQUFBLGlCQVZIO0FBQUE7QUFBQTtBQUFBO0FBQUEsbUJBV0E7QUFBQTtBQUFBO0FBQUEsUUF0QkssWUFBWUksSUFBSTtBQUFBLFFBRHZCO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUEsTUF3QkE7QUFBQSxJQUVKLENBQUMsS0E3Qkg7QUFBQTtBQUFBO0FBQUE7QUFBQSxXQThCQSxLQS9CRjtBQUFBO0FBQUE7QUFBQTtBQUFBLFdBZ0NBLEtBakNGO0FBQUE7QUFBQTtBQUFBO0FBQUEsV0FrQ0E7QUFBQSxPQTNFRjtBQUFBO0FBQUE7QUFBQTtBQUFBLFNBNEVBLEtBN0VGO0FBQUE7QUFBQTtBQUFBO0FBQUEsU0E4RUEsS0EvRUY7QUFBQTtBQUFBO0FBQUE7QUFBQSxTQWdGQTtBQUVKO0FBQUVILEdBekZXRixrQkFBZ0I7QUFBQSxVQUtiRixjQUFjO0FBQUE7QUFBQSxLQUxqQkU7QUFBZ0IsSUFBQU07QUFBQSxhQUFBQSxJQUFBIiwibmFtZXMiOlsiQnV0dG9uIiwiUHJvZ3Jlc3MiLCJDaGV2cm9uRG93biIsIkxvYWRlckNpcmNsZSIsInVzZVRyYW5zbGF0aW9uIiwiVGFza1R5cGUiLCJUeXBlQ2FyZFNrZWxldG9uIiwiaXNUYWtlQ29udHJvbCIsIl9zIiwidCIsIm1hcCIsInRhc2siLCJfYyJdLCJpZ25vcmVMaXN0IjpbXSwic291cmNlcyI6WyJUeXBlQ2FyZFNrZWxldG9uLnRzeCJdLCJzb3VyY2VzQ29udGVudCI6WyIvLyA9PT09PT09PT0gQ29weXJpZ2h0IDIwMjUtMjAyNiBAIGVpZ2VudC5haSBBbGwgUmlnaHRzIFJlc2VydmVkLiA9PT09PT09PT1cbi8vIExpY2Vuc2VkIHVuZGVyIHRoZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lvbiAyLjAgKHRoZSBcIkxpY2Vuc2VcIik7XG4vLyB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuXG4vLyBZb3UgbWF5IG9idGFpbiBhIGNvcHkgb2YgdGhlIExpY2Vuc2UgYXRcbi8vXG4vLyAgICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJQ0VOU0UtMi4wXG4vL1xuLy8gVW5sZXNzIHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFncmVlZCB0byBpbiB3cml0aW5nLCBzb2Z0d2FyZVxuLy8gZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vuc2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gXCJBUyBJU1wiIEJBU0lTLFxuLy8gV0lUSE9VVCBXQVJSQU5USUVTIE9SIENPTkRJVElPTlMgT0YgQU5ZIEtJTkQsIGVpdGhlciBleHByZXNzIG9yIGltcGxpZWQuXG4vLyBTZWUgdGhlIExpY2Vuc2UgZm9yIHRoZSBzcGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMgYW5kXG4vLyBsaW1pdGF0aW9ucyB1bmRlciB0aGUgTGljZW5zZS5cbi8vID09PT09PT09PSBDb3B5cmlnaHQgMjAyNS0yMDI2IEAgZWlnZW50LmFpIEFsbCBSaWdodHMgUmVzZXJ2ZWQuID09PT09PT09PVxuXG5pbXBvcnQgeyBCdXR0b24gfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvYnV0dG9uJztcbmltcG9ydCB7IFByb2dyZXNzIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL3Byb2dyZXNzJztcbmltcG9ydCB7IENoZXZyb25Eb3duLCBMb2FkZXJDaXJjbGUgfSBmcm9tICdsdWNpZGUtcmVhY3QnO1xuaW1wb3J0IHsgdXNlVHJhbnNsYXRpb24gfSBmcm9tICdyZWFjdC1pMThuZXh0JztcbmltcG9ydCB7IFRhc2tUeXBlIH0gZnJvbSAnLi9UYXNrVHlwZSc7XG5cbmV4cG9ydCBjb25zdCBUeXBlQ2FyZFNrZWxldG9uID0gKHtcbiAgaXNUYWtlQ29udHJvbCxcbn06IHtcbiAgaXNUYWtlQ29udHJvbDogYm9vbGVhbjtcbn0pID0+IHtcbiAgY29uc3QgeyB0IH0gPSB1c2VUcmFuc2xhdGlvbigpO1xuICByZXR1cm4gKFxuICAgIDxkaXY+XG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaC1hdXRvIHctZnVsbCBmbGV4LWNvbCBnYXAtMiBweS1zbSBwbC0yIHRyYW5zaXRpb24tYWxsIGR1cmF0aW9uLTMwMFwiPlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInJlbGF0aXZlIGgtYXV0byB3LWZ1bGwgb3ZlcmZsb3ctaGlkZGVuIHJvdW5kZWQteGwgYmctdGFzay1zdXJmYWNlIHB5LXNtIGJhY2tkcm9wLWJsdXItWzVweF1cIj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImFic29sdXRlIGxlZnQtMCB0b3AtMCB3LWZ1bGwgYmctdHJhbnNwYXJlbnRcIj5cbiAgICAgICAgICAgIDxQcm9ncmVzcyB2YWx1ZT17MTAwfSBjbGFzc05hbWU9XCJoLVsycHhdIHctZnVsbFwiIC8+XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJtYi0yLjUgZmxleCBmbGV4LWNvbCBnYXAtc20gcHgtc20gdGV4dC1zbSBmb250LWJvbGQgbGVhZGluZy0xM1wiPlxuICAgICAgICAgICAgPGRpdlxuICAgICAgICAgICAgICBjbGFzc05hbWU9e2BoLTUgdy1mdWxsIHJvdW5kZWQtZnVsbCBiZy1maWxsLXNrZWxvdGVuLWRlZmF1bHQgJHtcbiAgICAgICAgICAgICAgICAhaXNUYWtlQ29udHJvbCA/ICdhbmltYXRlLXB1bHNlJyA6ICcnXG4gICAgICAgICAgICAgIH1gfVxuICAgICAgICAgICAgPjwvZGl2PlxuICAgICAgICAgICAgPGRpdlxuICAgICAgICAgICAgICBjbGFzc05hbWU9e2BoLTUgdy0xLzIgcm91bmRlZC1mdWxsIGJnLWZpbGwtc2tlbG90ZW4tZGVmYXVsdCAke1xuICAgICAgICAgICAgICAgICFpc1Rha2VDb250cm9sID8gJ2FuaW1hdGUtcHVsc2UnIDogJydcbiAgICAgICAgICAgICAgfWB9XG4gICAgICAgICAgICA+PC9kaXY+XG4gICAgICAgICAgICA8ZGl2XG4gICAgICAgICAgICAgIGNsYXNzTmFtZT17YGgtNSB3LTEvMiByb3VuZGVkLWZ1bGwgYmctZmlsbC1za2Vsb3Rlbi1kZWZhdWx0ICR7XG4gICAgICAgICAgICAgICAgIWlzVGFrZUNvbnRyb2wgPyAnYW5pbWF0ZS1wdWxzZScgOiAnJ1xuICAgICAgICAgICAgICB9YH1cbiAgICAgICAgICAgID48L2Rpdj5cbiAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPXtgZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1iZXR3ZWVuIGdhcC0yIHB4LXNtYH0+XG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0yXCI+XG4gICAgICAgICAgICAgIDxUYXNrVHlwZSB0eXBlPXsxfSAvPlxuICAgICAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwidHJhbnNpdGlvbi1hbGwgZHVyYXRpb24tMzAwIGVhc2UtaW4tb3V0XCI+XG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgZ2FwLTIgZHVyYXRpb24tMzAwIGFuaW1hdGUtaW4gZmFkZS1pbi0wIHNsaWRlLWluLWZyb20tcmlnaHQtMlwiPlxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwidGV4dC14cyBmb250LW1lZGl1bSBsZWFkaW5nLTE3IHRleHQtdGV4dC10ZXJ0aWFyeVwiPlxuICAgICAgICAgICAgICAgICAge3QoJ2xheW91dC50YXNrcycpfVxuICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgIDxCdXR0b24gdmFyaWFudD1cImdob3N0XCIgc2l6ZT1cImljb25cIj5cbiAgICAgICAgICAgICAgICAgIDxDaGV2cm9uRG93blxuICAgICAgICAgICAgICAgICAgICBzaXplPXsxNn1cbiAgICAgICAgICAgICAgICAgICAgY2xhc3NOYW1lPXtgcm90YXRlLTE4MCB0cmFuc2l0aW9uLXRyYW5zZm9ybSBkdXJhdGlvbi0zMDBgfVxuICAgICAgICAgICAgICAgICAgLz5cbiAgICAgICAgICAgICAgICA8L0J1dHRvbj5cbiAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInJlbGF0aXZlXCI+XG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cIm92ZXJmbG93LWhpZGRlbiB0cmFuc2l0aW9uLWFsbCBkdXJhdGlvbi0zMDAgZWFzZS1pbi1vdXRcIj5cbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJtdC1zbSBmbGV4IGZsZXgtY29sIGdhcC0yIHB4LTJcIj5cbiAgICAgICAgICAgICAgICB7WzEsIDIsIDMsIDRdLm1hcCgodGFzazogbnVtYmVyKSA9PiB7XG4gICAgICAgICAgICAgICAgICByZXR1cm4gKFxuICAgICAgICAgICAgICAgICAgICA8ZGl2XG4gICAgICAgICAgICAgICAgICAgICAga2V5PXtgdGFza0xpc3QtJHt0YXNrfWB9XG4gICAgICAgICAgICAgICAgICAgICAgY2xhc3NOYW1lPXtgZmxleCBjdXJzb3ItcG9pbnRlciBnYXAtMiByb3VuZGVkLWxnIGJvcmRlciBib3JkZXItc29saWQgYm9yZGVyLXRyYW5zcGFyZW50IGJnLXRhc2stZmlsbC1kZWZhdWx0IHB4LXNtIHB5LXNtIHRyYW5zaXRpb24tYWxsIGR1cmF0aW9uLTMwMCBlYXNlLWluLW91dCBhbmltYXRlLWluIGZhZGUtaW4tMCBzbGlkZS1pbi1mcm9tLWxlZnQtMmB9XG4gICAgICAgICAgICAgICAgICAgID5cbiAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInB0LTAuNVwiPlxuICAgICAgICAgICAgICAgICAgICAgICAgPExvYWRlckNpcmNsZVxuICAgICAgICAgICAgICAgICAgICAgICAgICBzaXplPXsxNn1cbiAgICAgICAgICAgICAgICAgICAgICAgICAgY2xhc3NOYW1lPXtgdGV4dC1pY29uLXN1Y2Nlc3MgJHtcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAhaXNUYWtlQ29udHJvbCA/ICdhbmltYXRlLXNwaW4nIDogJydcbiAgICAgICAgICAgICAgICAgICAgICAgICAgfWB9XG4gICAgICAgICAgICAgICAgICAgICAgICAvPlxuICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBmbGV4LTEgZmxleC1jb2wgaXRlbXMtc3RhcnQganVzdGlmeS1jZW50ZXIgZ2FwLXNtXCI+XG4gICAgICAgICAgICAgICAgICAgICAgICA8ZGl2XG4gICAgICAgICAgICAgICAgICAgICAgICAgIGNsYXNzTmFtZT17YGgtNSB3LWZ1bGwgcm91bmRlZC1mdWxsIGJnLWZpbGwtc2tlbG90ZW4tZGVmYXVsdCB0ZXh0LXNtIGZvbnQtbWVkaXVtIGxlYWRpbmctMTMgJHtcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAhaXNUYWtlQ29udHJvbCA/ICdhbmltYXRlLXB1bHNlJyA6ICcnXG4gICAgICAgICAgICAgICAgICAgICAgICAgIH1gfVxuICAgICAgICAgICAgICAgICAgICAgICAgPjwvZGl2PlxuICAgICAgICAgICAgICAgICAgICAgICAgPGRpdlxuICAgICAgICAgICAgICAgICAgICAgICAgICBjbGFzc05hbWU9e2BoLTUgdy0xLzMgcm91bmRlZC1mdWxsIGJnLWZpbGwtc2tlbG90ZW4tZGVmYXVsdCB0ZXh0LXNtIGZvbnQtbWVkaXVtIGxlYWRpbmctMTMgJHtcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAhaXNUYWtlQ29udHJvbCA/ICdhbmltYXRlLXB1bHNlJyA6ICcnXG4gICAgICAgICAgICAgICAgICAgICAgICAgIH1gfVxuICAgICAgICAgICAgICAgICAgICAgICAgPjwvZGl2PlxuICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICAgICk7XG4gICAgICAgICAgICAgICAgfSl9XG4gICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgIDwvZGl2PlxuICAgICAgPC9kaXY+XG4gICAgPC9kaXY+XG4gICk7XG59O1xuXHJcblxyXG4iXSwiZmlsZSI6IkM6L1VzZXJzL1VzZXIvRGVza3RvcC9QUk9ZRUNUTy1SSVNLQ0FSRS9SSVNDQVJFL2VpZ2VudC1tYWluL3NyYy9jb21wb25lbnRzL0NoYXRCb3gvVGFza0JveC9UeXBlQ2FyZFNrZWxldG9uLnRzeCJ9

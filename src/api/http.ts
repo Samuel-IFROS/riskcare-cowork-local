@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,7 +10,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 import { showCreditsToast } from '@/components/Toast/creditsToast';
 import { showStorageToast } from '@/components/Toast/storageToast';
@@ -78,7 +78,9 @@ async function fetchRequest(
 ): Promise<any> {
   const baseURL = await getBaseURL();
   const requestPath =
-    isAbsoluteHttpUrl(url) || !url.startsWith('/api') ? url : stripApiPrefix(url);
+    isAbsoluteHttpUrl(url) || !url.startsWith('/api')
+      ? url
+      : stripApiPrefix(url);
   const fullUrl = isAbsoluteHttpUrl(requestPath)
     ? requestPath
     : `${baseURL}${requestPath}`;
@@ -205,10 +207,17 @@ async function getProxyBaseURL() {
 
   if (isDev) {
     const proxyUrl = import.meta.env.VITE_PROXY_URL;
-    if (!proxyUrl) {
-      return 'http://localhost:3001';
+    if (proxyUrl) {
+      return proxyUrl;
     }
-    return proxyUrl;
+
+    // In Electron dev we should prefer the backend port exposed by the main
+    // process instead of falling back to a separate proxy server.
+    if (window?.ipcRenderer?.invoke) {
+      return getBaseURL();
+    }
+
+    return 'http://localhost:3001';
   } else {
     const baseUrl = import.meta.env.VITE_BASE_URL;
     if (!baseUrl) {
@@ -385,5 +394,3 @@ export async function waitForBackendReady(
   );
   return false;
 }
-
-

@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,7 +10,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 import axios from 'axios';
 import {
@@ -124,7 +124,9 @@ const normalizeAppearanceForWindowIcon = (
   return WINDOW_THEME_ICON_DARK;
 };
 
-const resolveWindowIconPath = (appearance: string | null | undefined) => {
+const resolveWindowIconPath = (
+  appearance: string | null | undefined
+): string | null => {
   const normalizedAppearance = normalizeAppearanceForWindowIcon(appearance);
   const isWin = process.platform === 'win32';
   const iconCandidates = isWin
@@ -151,11 +153,11 @@ const resolveWindowIconPath = (appearance: string | null | undefined) => {
         ),
       ];
 
-  iconCandidates.push(path.join(VITE_PUBLIC, WINDOW_ICON_FALLBACK_NAME));
-  return (
-    iconCandidates.find((candidate) => existsSync(candidate)) ||
-    path.join(VITE_PUBLIC, WINDOW_ICON_FALLBACK_NAME)
+  iconCandidates.push(
+    path.join(VITE_PUBLIC, WINDOW_ICON_FALLBACK_NAME),
+    path.join(MAIN_DIST, 'build', 'icon.ico')
   );
+  return iconCandidates.find((candidate) => existsSync(candidate)) || null;
 };
 
 const applyWindowThemeIcon = (appearance: string | null | undefined) => {
@@ -163,7 +165,9 @@ const applyWindowThemeIcon = (appearance: string | null | undefined) => {
   if (process.platform !== 'win32' && process.platform !== 'linux') return;
 
   try {
-    win.setIcon(resolveWindowIconPath(appearance));
+    const iconPath = resolveWindowIconPath(appearance);
+    if (!iconPath) return;
+    win.setIcon(iconPath);
   } catch (error) {
     log.warn('[WINDOW ICON] Failed to update themed icon:', error);
   }

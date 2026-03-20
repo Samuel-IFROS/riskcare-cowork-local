@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,7 +10,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/store/authStore';
@@ -39,6 +39,8 @@ import eigentLogo from '@/assets/logo/eigent_icon.png';
 import eigentLogoWhite from '@/assets/logo/eigent_icon_white.png';
 
 const HAS_SUPABASE_AUTH = hasSupabaseAuthConfig();
+const USE_LOCAL_SIGNUP = import.meta.env.VITE_USE_LOCAL_PROXY === 'true';
+const SHOULD_USE_IN_APP_SIGNUP = USE_LOCAL_SIGNUP || !HAS_SUPABASE_AUTH;
 const extractAuthToken = (data: any): string | null => {
   if (typeof data?.token !== 'string') return null;
   const token = data.token.trim();
@@ -167,7 +169,11 @@ export default function Login() {
 
       const errorMessage = getLoginErrorMessage(data);
       if (errorMessage) {
-        setGeneralError(errorMessage);
+        setGeneralError(
+          !HAS_SUPABASE_AUTH && errorMessage
+            ? `${errorMessage} Esta instalacion usa una cuenta local. Si aun no la creaste aqui, entra por Registrarse.`
+            : errorMessage
+        );
         return;
       }
 
@@ -196,7 +202,9 @@ export default function Login() {
     } catch (error: any) {
       console.error('Login failed:', error);
       setGeneralError(
-        t('layout.login-failed-please-check-your-email-and-password')
+        !HAS_SUPABASE_AUTH
+          ? `${t('layout.login-failed-please-check-your-email-and-password')} Esta instalacion usa una cuenta local. Si te registraste en la web, crea la cuenta desde Registrarse en esta app.`
+          : t('layout.login-failed-please-check-your-email-and-password')
       );
     } finally {
       setIsLoading(false);
@@ -386,7 +394,7 @@ export default function Login() {
                 variant="ghost"
                 size="sm"
                 onClick={() => {
-                  if (import.meta.env.VITE_USE_LOCAL_PROXY === 'true') {
+                  if (SHOULD_USE_IN_APP_SIGNUP) {
                     navigate('/signup');
                   } else {
                     window.open(
@@ -400,6 +408,12 @@ export default function Login() {
                 {t('layout.sign-up')}
               </Button>
             </div>
+            {!HAS_SUPABASE_AUTH && (
+              <p className="mb-4 self-stretch text-label-md text-text-secondary">
+                Esta instalacion usa registro local. Si te registraste en la
+                web, crea la cuenta aqui para poder entrar.
+              </p>
+            )}
             {HAS_SUPABASE_AUTH && (
               <div className="w-full pt-6">
                 <Button

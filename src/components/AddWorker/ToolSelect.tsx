@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,7 +10,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 import {
   fetchGet,
@@ -20,6 +20,10 @@ import {
   proxyFetchPut,
 } from '@/api/http';
 import githubIcon from '@/assets/github.svg';
+import anthropicMcpIcon from '@/assets/mcp/Anthropic.svg?url';
+import camelMcpIcon from '@/assets/mcp/Camel.svg?url';
+import communityMcpIcon from '@/assets/mcp/Community.svg?url';
+import officialMcpIcon from '@/assets/mcp/Official.svg?url';
 import IntegrationList from '@/components/IntegrationList';
 import { Badge } from '@/components/ui/badge';
 import { capitalizeFirstLetter, getProxyBaseURL } from '@/lib';
@@ -267,17 +271,11 @@ const ToolSelect = forwardRef<
 
   // constants
   const categoryIconMap: Record<string, string> = {
-    anthropic: 'Anthropic',
-    community: 'Community',
-    official: 'Official',
-    camel: 'Camel',
+    anthropic: anthropicMcpIcon,
+    community: communityMcpIcon,
+    official: officialMcpIcon,
+    camel: camelMcpIcon,
   };
-
-  const svgIcons = import.meta.glob('@/assets/mcp/*.svg', {
-    eager: true,
-    query: '?url',
-    import: 'default',
-  });
 
   // data fetching
   const fetchData = (keyword?: string) => {
@@ -664,10 +662,7 @@ const ToolSelect = forwardRef<
   const getCategoryIcon = (categoryName?: string) => {
     if (!categoryName) return <Store className="h-4 w-4 text-icon-primary" />;
 
-    const iconKey = categoryIconMap[categoryName];
-    const iconUrl = iconKey
-      ? (svgIcons[`/src/assets/mcp/${iconKey}.svg`] as string)
-      : undefined;
+    const iconUrl = categoryIconMap[categoryName];
 
     return iconUrl ? (
       <img src={iconUrl} alt={categoryName} className="h-4 w-4" />
@@ -912,5 +907,3 @@ const ToolSelect = forwardRef<
 ToolSelect.displayName = 'ToolSelect';
 
 export default ToolSelect;
-
-

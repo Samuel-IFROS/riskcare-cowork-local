@@ -1,7 +1,7 @@
 {
   "name": "eigent",
   "version": "0.0.84",
-  "main": "dist-electron/main/index.js",
+  "main": "electron/main/bootstrap.cjs",
   "description": "eigent",
   "author": "eigent.AI",
   "license": "MIT",

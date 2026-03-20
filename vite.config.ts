@@ -19,6 +19,21 @@ import { defineConfig, loadEnv } from 'vite';
 import electron from 'vite-plugin-electron/simple';
 import pkg from './package.json';
 
+function getSanitizedElectronEnv() {
+  const env = { ...process.env };
+
+  // Electron-based IDE terminals can leak these vars into child processes.
+  // When that happens, the dev Electron child starts in Node mode and the app
+  // either crashes or renders a blank window.
+  delete env.ELECTRON_RUN_AS_NODE;
+  delete env.ELECTRON_FORCE_IS_PACKAGED;
+  delete env.ICUBE_ELECTRON_PATH;
+  delete env.ICUBE_IS_ELECTRON;
+  delete env.VSCODE_RUN_IN_ELECTRON;
+
+  return env;
+}
+
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
   rmSync('dist-electron', { recursive: true, force: true });
@@ -27,6 +42,12 @@ export default defineConfig(({ command, mode }) => {
   const isBuild = command === 'build';
   const sourcemap = isServe || !!process.env.VSCODE_DEBUG;
   const env = loadEnv(mode, process.cwd(), '');
+  const dependencyList = Object.keys(
+    'dependencies' in pkg ? pkg.dependencies : {}
+  );
+  const mainExternalDependencies = dependencyList.filter(
+    (dependency) => dependency !== 'mime'
+  );
   return {
     resolve: {
       alias: {
@@ -49,18 +70,23 @@ export default defineConfig(({ command, mode }) => {
                 /* For `.vscode/.debug.script.mjs` */ '[startup] Electron App'
               );
             } else {
-              args.startup();
+              args.startup(['.', '--no-sandbox'], {
+                env: getSanitizedElectronEnv(),
+              });
             }
           },
           vite: {
             build: {
+              lib: {
+                entry: 'electron/main/index.ts',
+                formats: ['cjs'],
+                fileName: () => 'index.cjs',
+              },
               sourcemap,
               minify: isBuild,
               outDir: 'dist-electron/main',
               rollupOptions: {
-                external: Object.keys(
-                  'dependencies' in pkg ? pkg.dependencies : {}
-                ),
+                external: mainExternalDependencies,
               },
             },
           },
@@ -75,9 +101,7 @@ export default defineConfig(({ command, mode }) => {
               minify: isBuild,
               outDir: 'dist-electron/preload',
               rollupOptions: {
-                external: Object.keys(
-                  'dependencies' in pkg ? pkg.dependencies : {}
-                ),
+                external: dependencyList,
               },
             },
           },

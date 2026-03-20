@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,10 +10,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 import { proxyFetchDelete, proxyFetchGet, proxyFetchPost } from '@/api/http';
 import githubIcon from '@/assets/github.svg';
+import anthropicMcpIcon from '@/assets/mcp/Anthropic.svg?url';
+import camelMcpIcon from '@/assets/mcp/Camel.svg?url';
+import communityMcpIcon from '@/assets/mcp/Community.svg?url';
+import officialMcpIcon from '@/assets/mcp/Official.svg?url';
 import SearchInput from '@/components/SearchInput';
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
@@ -58,18 +62,11 @@ function useDebounce<T>(value: T, delay: number): T {
 
 // map category name to svg file name
 const categoryIconMap: Record<string, string> = {
-  anthropic: 'Anthropic',
-  community: 'Community',
-  official: 'Official',
-  camel: 'Camel',
+  anthropic: anthropicMcpIcon,
+  community: communityMcpIcon,
+  official: officialMcpIcon,
+  camel: camelMcpIcon,
 };
-
-// load all svg files dynamically
-const svgIcons = import.meta.glob('@/assets/mcp/*.svg', {
-  eager: true,
-  query: '?url',
-  import: 'default',
-});
 
 type MCPMarketProps = {
   onBack?: () => void;
@@ -340,10 +337,7 @@ export default function MCPMarket({
             <div className="mr-4 flex items-center">
               {(() => {
                 const catName = item.category?.name;
-                const iconKey = catName ? categoryIconMap[catName] : undefined;
-                const iconUrl = iconKey
-                  ? (svgIcons[`/src/assets/mcp/${iconKey}.svg`] as string)
-                  : undefined;
+                const iconUrl = catName ? categoryIconMap[catName] : undefined;
                 return iconUrl ? (
                   <img src={iconUrl} alt={catName} className="h-11 w-9" />
                 ) : (
@@ -424,5 +418,3 @@ export default function MCPMarket({
     </div>
   );
 }
-
-

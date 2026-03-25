@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,12 +10,16 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
-import { Copy, FileText } from 'lucide-react';
-import { useMemo } from 'react';
+import { Check, Copy, FileText } from 'lucide-react';
+import { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { Button } from '../../ui/button';
 import { MarkDown } from './MarkDown';
+
+const COPIED_RESET_MS = 2000;
 
 interface AgentMessageCardProps {
   id: string;
@@ -48,6 +52,9 @@ export function AgentMessageCard({
   // if completed, disable typewriter effect
   const enableTypewriter = !isCompleted;
 
+  const [copied, setCopied] = useState(false);
+  const { t } = useTranslation();
+
   // when typewriter effect is completed, record to global Map
   const handleTypingComplete = () => {
     if (!isCompleted) {
@@ -58,18 +65,29 @@ export function AgentMessageCard({
     }
   };
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(content);
-  };
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(content);
+      toast.success(t('setting.copied-to-clipboard'));
+      setCopied(true);
+      setTimeout(() => setCopied(false), COPIED_RESET_MS);
+    } catch {
+      toast.error('Failed to copy to clipboard');
+    }
+  }, [content, t]);
 
   return (
     <div
       key={id}
-      className={`relative w-full rounded-xl border bg-message-fill-default px-sm py-3 ${className || ''} group overflow-hidden`}
+      className={`relative w-full rounded-xl bg-transparent px-sm py-3 ${className || ''} group overflow-hidden`}
     >
       <div className="absolute bottom-[0px] right-1 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
         <Button onClick={handleCopy} variant="ghost" size="icon">
-          <Copy />
+          {copied ? (
+            <Check className="h-4 w-4 text-text-success" />
+          ) : (
+            <Copy className="h-4 w-4" />
+          )}
         </Button>
       </div>
       <MarkDown
@@ -106,5 +124,3 @@ export function AgentMessageCard({
     </div>
   );
 }
-
-

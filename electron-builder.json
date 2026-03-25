@@ -7,6 +7,7 @@
     "output": "release"
   },
   "files": [
+    "electron/main/bootstrap.cjs",
     "dist-electron",
     "dist",
     "resources",
@@ -114,7 +115,7 @@
     ]
   },
   "win": {
-    "icon": "build/icon-256.png",
+    "icon": "build/icon.ico",
     "artifactName": "${productName}-Setup-${version}.exe",
     "target": [
       {
@@ -142,5 +143,3 @@
     "installerHeaderIcon": "build/icon.ico"
   }
 }
-
-

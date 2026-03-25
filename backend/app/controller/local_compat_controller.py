@@ -46,10 +46,7 @@ def put_user_privacy(payload: dict[str, Any]):
 def get_user_key():
     env_key = os.getenv("OPENAI_API_KEY", "").strip()
     local_key = local_store.get_user_key()
-    api_url = (
-        os.getenv("OPENAI_API_BASE_URL", "").strip()
-        or "https://api.openai.com/v1"
-    )
+    api_url = os.getenv("OPENAI_API_BASE_URL", "").strip()
     return {"value": env_key or local_key, "api_url": api_url}
 
 

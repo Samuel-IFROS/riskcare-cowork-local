@@ -22,6 +22,9 @@ const defaultHeaders = {
 };
 
 const LOCAL_HOSTNAMES = new Set(['localhost', '127.0.0.1', '::1', '[::1]']);
+const hasElectronIPC = () =>
+  typeof window !== 'undefined' &&
+  typeof (window as Partial<Window>).ipcRenderer?.invoke === 'function';
 
 let baseUrl = '';
 export async function getBaseURL() {
@@ -44,7 +47,7 @@ const stripApiPrefix = (url: string) => {
 
 const isLocalBackendBaseURL = async (baseURL: string): Promise<boolean> => {
   try {
-    if (!window?.ipcRenderer?.invoke) return false;
+    if (!hasElectronIPC()) return false;
 
     const parsed = new URL(baseURL);
     if (!LOCAL_HOSTNAMES.has(parsed.hostname)) return false;
@@ -203,6 +206,13 @@ export const fetchDelete = (url: string, data?: any, headers?: any) =>
 
 // get proxy base URL
 async function getProxyBaseURL() {
+  // Electron should always prefer the backend port provided by the main
+  // process, regardless of whether the renderer was built in dev or prod.
+  // This keeps auth and local APIs working in unpacked/portable builds.
+  if (hasElectronIPC()) {
+    return getBaseURL();
+  }
+
   const isDev = import.meta.env.DEV;
 
   if (isDev) {
@@ -210,21 +220,14 @@ async function getProxyBaseURL() {
     if (proxyUrl) {
       return proxyUrl;
     }
-
-    // In Electron dev we should prefer the backend port exposed by the main
-    // process instead of falling back to a separate proxy server.
-    if (window?.ipcRenderer?.invoke) {
-      return getBaseURL();
-    }
-
     return 'http://localhost:3001';
-  } else {
-    const baseUrl = import.meta.env.VITE_BASE_URL;
-    if (!baseUrl) {
-      throw new Error('VITE_BASE_URL not configured');
-    }
-    return baseUrl;
   }
+
+  const baseUrl = import.meta.env.VITE_BASE_URL;
+  if (!baseUrl) {
+    throw new Error('VITE_BASE_URL not configured');
+  }
+  return baseUrl;
 }
 
 async function proxyFetchRequest(

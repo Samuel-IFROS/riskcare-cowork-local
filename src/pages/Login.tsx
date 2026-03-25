@@ -30,17 +30,15 @@ import {
   buildGooglePkceVerifier,
   buildSupabaseGoogleAuthorizeUrl,
   hasSupabaseAuthConfig,
+  subscribeRiskcareRuntimeConfig,
 } from '@/lib/supabaseAuth';
 import { loadCoworkWorkers } from '@/service/coworkWorkers';
 import { useTranslation } from 'react-i18next';
 
 import background from '@/assets/background.png';
-import eigentLogo from '@/assets/logo/eigent_icon.png';
-import eigentLogoWhite from '@/assets/logo/eigent_icon_white.png';
+import riskcareLogo from '@/assets/logo/logo_black.png';
+import riskcareLogoWhite from '@/assets/logo/logo_white.png';
 
-const HAS_SUPABASE_AUTH = hasSupabaseAuthConfig();
-const USE_LOCAL_SIGNUP = import.meta.env.VITE_USE_LOCAL_PROXY === 'true';
-const SHOULD_USE_IN_APP_SIGNUP = USE_LOCAL_SIGNUP || !HAS_SUPABASE_AUTH;
 const extractAuthToken = (data: any): string | null => {
   if (typeof data?.token !== 'string') return null;
   const token = data.token.trim();
@@ -48,8 +46,13 @@ const extractAuthToken = (data: any): string | null => {
 };
 let lock = false;
 export default function Login() {
-  const { setAuth, setModelType, setLocalProxyValue, setWorkerList } =
-    useAuthStore();
+  const {
+    setAuth,
+    setModelType,
+    setCloudModelType,
+    setLocalProxyValue,
+    setWorkerList,
+  } = useAuthStore();
   const appearance = useAuthStore((state) => state.appearance);
   const navigate = useNavigate();
   const location = useLocation();
@@ -67,7 +70,10 @@ export default function Login() {
   const [generalError, setGeneralError] = useState('');
   const titlebarRef = useRef<HTMLDivElement>(null);
   const [platform, setPlatform] = useState<string>('');
-  const logoSrc = appearance === 'dark' ? eigentLogoWhite : eigentLogo;
+  const [hasSupabaseAuth, setHasSupabaseAuth] = useState(() =>
+    hasSupabaseAuthConfig()
+  );
+  const logoSrc = appearance === 'dark' ? riskcareLogoWhite : riskcareLogo;
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -170,7 +176,7 @@ export default function Login() {
       const errorMessage = getLoginErrorMessage(data);
       if (errorMessage) {
         setGeneralError(
-          !HAS_SUPABASE_AUTH && errorMessage
+          !hasSupabaseAuth && errorMessage
             ? `${errorMessage} Esta instalacion usa una cuenta local. Si aun no la creaste aqui, entra por Registrarse.`
             : errorMessage
         );
@@ -195,14 +201,15 @@ export default function Login() {
           : await loadCoworkWorkers(authToken);
         setWorkerList(workers);
       }
-      setModelType('custom');
+      setModelType('cloud');
+      setCloudModelType('gemini-3-pro-preview');
       const localProxyValue = import.meta.env.VITE_USE_LOCAL_PROXY || null;
       setLocalProxyValue(localProxyValue);
       navigate('/');
     } catch (error: any) {
       console.error('Login failed:', error);
       setGeneralError(
-        !HAS_SUPABASE_AUTH
+        !hasSupabaseAuth
           ? `${t('layout.login-failed-please-check-your-email-and-password')} Esta instalacion usa una cuenta local. Si te registraste en la web, crea la cuenta desde Registrarse en esta app.`
           : t('layout.login-failed-please-check-your-email-and-password')
       );
@@ -212,7 +219,7 @@ export default function Login() {
   };
 
   const handleGoogleLogin = useCallback(async () => {
-    if (!HAS_SUPABASE_AUTH) {
+    if (!hasSupabaseAuth) {
       setGeneralError('Supabase OAuth is not configured.');
       return;
     }
@@ -228,7 +235,7 @@ export default function Login() {
       console.error('Failed to start Google OAuth:', error);
       setGeneralError(t('layout.login-failed-please-try-again'));
     }
-  }, [setGeneralError, t]);
+  }, [hasSupabaseAuth, setGeneralError, t]);
 
   const handleAuthCode = useCallback(
     async (_event: any, code: string) => {
@@ -274,7 +281,8 @@ export default function Login() {
             : await loadCoworkWorkers(authToken);
           setWorkerList(workers);
         }
-        setModelType('custom');
+        setModelType('cloud');
+        setCloudModelType('gemini-3-pro-preview');
         const localProxyValue = import.meta.env.VITE_USE_LOCAL_PROXY || null;
         setLocalProxyValue(localProxyValue);
         navigate('/');
@@ -300,6 +308,7 @@ export default function Login() {
       setGeneralError,
       setIsLoading,
       setLocalProxyValue,
+      setCloudModelType,
       setModelType,
       setWorkerList,
       t,
@@ -321,6 +330,13 @@ export default function Login() {
     if (p === 'darwin') {
       titlebarRef.current?.classList.add('mac');
     }
+  }, []);
+
+  useEffect(() => {
+    setHasSupabaseAuth(hasSupabaseAuthConfig());
+    return subscribeRiskcareRuntimeConfig(() => {
+      setHasSupabaseAuth(hasSupabaseAuthConfig());
+    });
   }, []);
 
   // Handle before-close event for login page
@@ -393,28 +409,18 @@ export default function Login() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => {
-                  if (SHOULD_USE_IN_APP_SIGNUP) {
-                    navigate('/signup');
-                  } else {
-                    window.open(
-                      'https://www.eigent.ai/signup',
-                      '_blank',
-                      'noopener,noreferrer'
-                    );
-                  }
-                }}
+                onClick={() => navigate('/signup')}
               >
                 {t('layout.sign-up')}
               </Button>
             </div>
-            {!HAS_SUPABASE_AUTH && (
+            {!hasSupabaseAuth && (
               <p className="mb-4 self-stretch text-label-md text-text-secondary">
                 Esta instalacion usa registro local. Si te registraste en la
                 web, crea la cuenta aqui para poder entrar.
               </p>
             )}
-            {HAS_SUPABASE_AUTH && (
+            {hasSupabaseAuth && (
               <div className="w-full pt-6">
                 <Button
                   variant="primary"
@@ -430,7 +436,7 @@ export default function Login() {
                 </Button>
               </div>
             )}
-            {HAS_SUPABASE_AUTH && (
+            {hasSupabaseAuth && (
               <div className="mb-6 mt-2 w-full text-center font-inter text-[15px] font-medium leading-[22px] text-[#222]">
                 {t('layout.or')}
               </div>

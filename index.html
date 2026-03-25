@@ -2,7 +2,12 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+		<link
+			rel="icon"
+			type="image/png"
+			href="./riskcare-logo-icon-blanco.png"
+			data-riskcare-favicon="true"
+		/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<!-- Content Security Policy: CDN allowlist for agent-generated HTML -->
 		<meta
@@ -103,6 +108,13 @@
 					const appearance = parsed?.state?.appearance || 'dark';
 					const theme = appearance === 'transparent' ? 'transparent' : appearance === 'light' ? 'light' : 'dark';
 					document.documentElement.setAttribute('data-theme', theme);
+					const favicon = document.querySelector('link[data-riskcare-favicon="true"]');
+					if (favicon) {
+						favicon.href =
+							theme === 'light'
+								? './riskcare-logo-icon.png'
+								: './riskcare-logo-icon-blanco.png';
+					}
 				} catch (_error) {
 					document.documentElement.setAttribute('data-theme', 'dark');
 				}

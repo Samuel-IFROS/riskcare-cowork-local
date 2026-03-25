@@ -19,6 +19,7 @@ import {
   dialog,
   ipcMain,
   Menu,
+  nativeImage,
   nativeTheme,
   protocol,
   session,
@@ -50,6 +51,7 @@ import {
 } from './install-deps';
 import { registerUpdateIpcHandlers, update } from './update';
 import {
+  ensureRiskcareRuntimeDefaults,
   getEmailFolderPath,
   getEnvPath,
   maskProxyUrl,
@@ -160,14 +162,30 @@ const resolveWindowIconPath = (
   return iconCandidates.find((candidate) => existsSync(candidate)) || null;
 };
 
+const resolveWindowIcon = (appearance: string | null | undefined) => {
+  const iconPath = resolveWindowIconPath(appearance);
+  if (!iconPath) return null;
+
+  const icon = nativeImage.createFromPath(iconPath);
+  return icon.isEmpty() ? null : icon;
+};
+
 const applyWindowThemeIcon = (appearance: string | null | undefined) => {
   if (!win || win.isDestroyed()) return;
   if (process.platform !== 'win32' && process.platform !== 'linux') return;
 
   try {
-    const iconPath = resolveWindowIconPath(appearance);
-    if (!iconPath) return;
-    win.setIcon(iconPath);
+    const normalizedAppearance = normalizeAppearanceForWindowIcon(appearance);
+    if (process.platform === 'win32') {
+      nativeTheme.themeSource =
+        normalizedAppearance === WINDOW_THEME_ICON_LIGHT ? 'light' : 'dark';
+      win.setBackgroundColor(
+        normalizedAppearance === WINDOW_THEME_ICON_LIGHT ? '#ffffff' : '#1e1e1e'
+      );
+    }
+    const icon = resolveWindowIcon(appearance);
+    if (!icon) return;
+    win.setIcon(icon);
   } catch (error) {
     log.warn('[WINDOW ICON] Failed to update themed icon:', error);
   }
@@ -217,6 +235,13 @@ app.commandLine.appendSwitch('enable-features', 'MemoryPressureReduction');
 app.commandLine.appendSwitch('renderer-process-limit', '8');
 
 // ==================== Proxy configuration ====================
+try {
+  ensureRiskcareRuntimeDefaults();
+  log.info('[RISKCARE CONFIG] Runtime defaults checked');
+} catch (error) {
+  log.warn('[RISKCARE CONFIG] Failed to seed runtime defaults', error);
+}
+
 // Read proxy from global .env file on startup
 proxyUrl = readGlobalEnvKey('HTTP_PROXY');
 if (proxyUrl) {
@@ -285,8 +310,8 @@ log.transports.file.format = '[{level}]{text}';
 // Disable GPU Acceleration for Windows 7
 if (os.release().startsWith('6.1')) app.disableHardwareAcceleration();
 
-// Set application name for Windows 10+ notifications
-if (process.platform === 'win32') app.setAppUserModelId(app.getName());
+// Set a stable Windows app identity so icon caching does not keep grouping us as Eigent.
+if (process.platform === 'win32') app.setAppUserModelId('com.riskcare.app');
 
 if (!app.requestSingleInstanceLock()) {
   app.quit();
@@ -1628,7 +1653,7 @@ let installationLock: Promise<PromiseReturnType> = Promise.resolve({
 // ==================== window create ====================
 async function createWindow() {
   const isMac = process.platform === 'darwin';
-  const appWindowIcon = resolveWindowIconPath(
+  const appWindowIcon = resolveWindowIcon(
     nativeTheme.shouldUseDarkColors ? 'dark' : 'light'
   );
 
@@ -1675,7 +1700,7 @@ async function createWindow() {
     // macOS-specific title bar styling
     titleBarStyle: isMac ? 'hidden' : undefined,
     trafficLightPosition: isMac ? { x: 10, y: 10 } : undefined,
-    icon: appWindowIcon,
+    icon: appWindowIcon ?? undefined,
     // Rounded corners on macOS and Linux (as original)
     roundedCorners: !isWindows,
     // Windows-specific options
@@ -1941,7 +1966,7 @@ async function createWindow() {
                   language: 'system',
                   isFirstLaunch: true,
                   modelType: 'cloud',
-                  cloud_model_type: 'gpt-4.1',
+                  cloud_model_type: 'gemini-3-pro-preview',
                   initState: 'carousel',
                   share_token: null,
                   workerListData: {}

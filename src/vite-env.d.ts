@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,14 +10,26 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 /// <reference types="vite/client" />
+
+interface ImportMetaEnv {
+  readonly VITE_ENABLE_ANALYTICS?: string;
+  readonly VITE_PROFILE_MANAGEMENT_URL?: string;
+  readonly VITE_RISKCARE_PROFILE_URL?: string;
+  readonly VITE_RISKCARE_SUPABASE_PUBLISHABLE_KEY?: string;
+  readonly VITE_RISKCARE_SUPABASE_URL?: string;
+  readonly VITE_SUPABASE_PUBLISHABLE_KEY?: string;
+  readonly VITE_SUPABASE_URL?: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
 
 interface Window {
   // expose in the `electron/preload/index.ts`
   ipcRenderer: import('electron').IpcRenderer;
   electronAPI: import('electron').ElectronAPI;
 }
-
-

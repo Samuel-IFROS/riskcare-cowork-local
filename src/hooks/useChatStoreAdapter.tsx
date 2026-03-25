@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,7 +10,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 import { ChatStore } from '@/store/chatStore';
 import { ProjectStore, useProjectStore } from '@/store/projectStore';
@@ -41,16 +41,80 @@ const useChatStoreAdapter = (): {
   chatStore: ChatStore;
 } => {
   const projectStore = useProjectStore();
+  const {
+    activeProjectId,
+    projects,
+    createProject,
+    createChatStore,
+    setActiveProject,
+    setActiveChatStore,
+  } = projectStore;
 
-  // Get the active chat store from project store
-  // This creates a hook-like interface for the vanilla store
-  const activeChatStore = projectStore.getActiveChatStore();
+  const resolvedProjectId = useMemo(() => {
+    if (activeProjectId) {
+      return activeProjectId;
+    }
+
+    return Object.keys(projects)[0] ?? null;
+  }, [activeProjectId, projects]);
+
+  const activeChatStore = useMemo(() => {
+    if (!resolvedProjectId) return null;
+
+    const activeProject = projects[resolvedProjectId];
+    if (!activeProject) return null;
+
+    const fallbackChatId = Object.keys(activeProject.chatStores)[0];
+    const activeChatId = activeProject.activeChatId || fallbackChatId;
+    if (!activeChatId) return null;
+
+    return activeProject.chatStores[activeChatId] ?? null;
+  }, [projects, resolvedProjectId]);
 
   // Create a state subscription to make the component reactive
   const [chatState, dispatch] = useReducer(
     chatStateReducer,
     activeChatStore ? activeChatStore.getState() : null
   );
+
+  useEffect(() => {
+    if (!resolvedProjectId) {
+      createProject('New Project', 'Auto-created project');
+      return;
+    }
+
+    if (!activeProjectId) {
+      setActiveProject(resolvedProjectId);
+      return;
+    }
+
+    const activeProject = projects[resolvedProjectId];
+    if (!activeProject) {
+      createProject('New Project', 'Auto-created project');
+      return;
+    }
+    const chatIds = Object.keys(activeProject.chatStores);
+
+    if (chatIds.length === 0) {
+      createChatStore(resolvedProjectId);
+      return;
+    }
+
+    if (
+      !activeProject.activeChatId ||
+      !activeProject.chatStores[activeProject.activeChatId]
+    ) {
+      setActiveChatStore(resolvedProjectId, chatIds[0]);
+    }
+  }, [
+    activeProjectId,
+    resolvedProjectId,
+    projects,
+    createProject,
+    createChatStore,
+    setActiveProject,
+    setActiveChatStore,
+  ]);
 
   useEffect(() => {
     if (!activeChatStore) {
@@ -97,5 +161,3 @@ const useChatStoreAdapter = (): {
 };
 
 export default useChatStoreAdapter;
-
-

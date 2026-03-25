@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,11 +10,15 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 import { Button } from '@/components/ui/button';
-import { Copy } from 'lucide-react';
-import { useState } from 'react';
+import { Check, Copy } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+
+const COPIED_RESET_MS = 2000;
 
 interface FeedbackCardProps {
   id: string;
@@ -34,10 +38,34 @@ export function FeedbackCard({
   className,
 }: FeedbackCardProps) {
   const [_isHovered, setIsHovered] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const timeoutRef = useRef<number | null>(null);
+  const { t } = useTranslation();
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(content);
-  };
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(content);
+      toast.success(t('setting.copied-to-clipboard'));
+      setCopied(true);
+      if (timeoutRef.current !== null) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = window.setTimeout(() => {
+        setCopied(false);
+        timeoutRef.current = null;
+      }, COPIED_RESET_MS);
+    } catch {
+      toast.error(t('setting.failed-to-copy-to-clipboard'));
+    }
+  }, [content, t]);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current !== null) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div
@@ -49,7 +77,11 @@ export function FeedbackCard({
       {/* Copy button - appears on hover */}
       <div className="absolute bottom-1 right-1 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
         <Button onClick={handleCopy} variant="ghost" size="icon">
-          <Copy className="h-4 w-4" />
+          {copied ? (
+            <Check className="h-4 w-4 text-text-success" />
+          ) : (
+            <Copy className="h-4 w-4" />
+          )}
         </Button>
       </div>
 
@@ -80,5 +112,3 @@ export function FeedbackCard({
     </div>
   );
 }
-
-

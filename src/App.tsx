@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,14 +10,20 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
+import { queryClient } from '@/lib/queryClient';
+import { setRiskcareRuntimeConfig } from '@/lib/supabaseAuth';
 import AppRoutes from '@/routers/index';
 import { stackClientApp } from '@/stack/client';
 import { StackProvider, StackTheme } from '@stackframe/react';
+import { QueryClientProvider } from '@tanstack/react-query';
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
+import { useBackgroundTaskProcessor } from './hooks/useBackgroundTaskProcessor';
+import { useExecutionSubscription } from './hooks/useExecutionSubscription';
+import { useTriggerTaskExecutor } from './hooks/useTriggerTaskExecutor';
 import { hasStackKeys } from './lib';
 import { useAuthStore } from './store/authStore';
 
@@ -25,12 +31,54 @@ const HAS_STACK_KEYS = hasStackKeys();
 
 function App() {
   const navigate = useNavigate();
-  const { setInitState, setModelType, setCloudModelType } = useAuthStore();
+  const { setInitState, setModelType, setCloudModelType, token } =
+    useAuthStore();
+
+  useExecutionSubscription(!!token);
+  useBackgroundTaskProcessor();
+  useTriggerTaskExecutor();
 
   useEffect(() => {
-    setModelType('custom');
+    setModelType('cloud');
     setCloudModelType('gemini-3-pro-preview');
   }, [setModelType, setCloudModelType]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const syncRiskcareRuntimeConfig = async () => {
+      if (!window.electronAPI?.readGlobalEnv) {
+        return;
+      }
+
+      try {
+        const configKeys = [
+          'RISKCARE_SUPABASE_URL',
+          'RISKCARE_SUPABASE_PUBLISHABLE_KEY',
+          'RISKCARE_PROFILE_URL',
+        ] as const;
+
+        const entries = await Promise.all(
+          configKeys.map(async (key) => {
+            const response = await window.electronAPI.readGlobalEnv(key);
+            return [key, response?.value?.trim() || ''] as const;
+          })
+        );
+
+        if (!cancelled) {
+          setRiskcareRuntimeConfig(Object.fromEntries(entries));
+        }
+      } catch (error) {
+        console.warn('Failed to load Riskcare runtime config:', error);
+      }
+    };
+
+    void syncRiskcareRuntimeConfig();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const handleShareCode = (event: any, share_token: string) => {
@@ -70,17 +118,21 @@ function App() {
 
   // render wrapper
   const renderWrapper = (children: React.ReactNode) => {
+    const content = (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+
     if (HAS_STACK_KEYS) {
       return (
         <StackProvider app={stackClientApp}>
-          <StackTheme>{children}</StackTheme>
+          <StackTheme>{content}</StackTheme>
           <Toaster style={{ zIndex: '999999 !important', position: 'fixed' }} />
         </StackProvider>
       );
     }
     return (
       <>
-        {children}
+        {content}
         <Toaster style={{ zIndex: '999999 !important', position: 'fixed' }} />
       </>
     );
@@ -90,4 +142,3 @@ function App() {
 }
 
 export default App;
-

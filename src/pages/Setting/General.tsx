@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,18 +10,15 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 import dark from '@/assets/dark.png';
 import light from '@/assets/light.png';
 import transparent from '@/assets/transparent.png';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  type LanguagePreference,
-  LocaleEnum,
-  switchLanguage,
-} from '@/i18n';
+import { type LanguagePreference, LocaleEnum, switchLanguage } from '@/i18n';
+import { getProfileManagementUrl } from '@/lib/supabaseAuth';
 import { useAuthStore } from '@/store/authStore';
 import { useInstallationStore } from '@/store/installationStore';
 import { LogOut, Settings } from 'lucide-react';
@@ -83,6 +80,7 @@ export default function SettingGeneral() {
   const [proxyUrl, setProxyUrl] = useState('');
   const [isProxySaving, setIsProxySaving] = useState(false);
   const [proxyNeedsRestart, setProxyNeedsRestart] = useState(false);
+  const [showLocalProfilePanel, setShowLocalProfilePanel] = useState(false);
 
   useEffect(() => {
     const platform = window.electronAPI.getPlatform();
@@ -244,6 +242,41 @@ export default function SettingGeneral() {
     }
   };
 
+  const handleCopyEmail = async () => {
+    if (!authStore.email) return;
+
+    try {
+      await navigator.clipboard.writeText(authStore.email);
+      toast.success('Correo copiado');
+    } catch (error) {
+      console.error('Failed to copy email:', error);
+      toast.error('No se pudo copiar el correo');
+    }
+  };
+
+  const handleManageProfile = () => {
+    const profileManagementUrl = getProfileManagementUrl(authStore.email);
+
+    if (!profileManagementUrl) {
+      setShowLocalProfilePanel((previous) => !previous);
+      return;
+    }
+
+    setShowLocalProfilePanel(false);
+
+    if (/^https?:\/\//i.test(profileManagementUrl)) {
+      window.open(profileManagementUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    if (profileManagementUrl.startsWith('#')) {
+      navigate(profileManagementUrl.replace(/^#/, '') || '/');
+      return;
+    }
+
+    navigate(profileManagementUrl);
+  };
+
   if (!chatStore) {
     return <div>Loading...</div>;
   }
@@ -263,49 +296,67 @@ export default function SettingGeneral() {
       {/* Content Section */}
       <div className="mb-8 flex flex-col gap-6">
         {/* Profile Section */}
-        <div className="item-center flex flex-row justify-between rounded-2xl bg-surface-secondary px-6 py-4">
-          <div className="flex flex-col gap-2">
-            <div className="text-body-base font-bold text-text-heading">
-              {t('setting.profile')}
+        <div className="rounded-2xl bg-surface-secondary px-6 py-4">
+          <div className="item-center flex flex-row justify-between gap-4">
+            <div className="flex flex-col gap-2">
+              <div className="text-body-base font-bold text-text-heading">
+                {t('setting.profile')}
+              </div>
+              <div className="text-body-sm">
+                <Trans
+                  i18nKey="setting.you-are-currently-signed-in-with"
+                  values={{ email: authStore.email }}
+                  components={{
+                    email: <span className="text-text-information underline" />,
+                  }}
+                />
+              </div>
             </div>
-            <div className="text-body-sm">
-              <Trans
-                i18nKey="setting.you-are-currently-signed-in-with"
-                values={{ email: authStore.email }}
-                components={{
-                  email: <span className="text-text-information underline" />,
+            <div className="flex items-center gap-sm">
+              <Button onClick={handleManageProfile} variant="primary" size="sm">
+                <Settings className="h-4 w-4 text-button-primary-icon-default" />
+                {t('setting.manage')}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  chatStore.clearTasks();
+
+                  resetInstallation(); // Reset installation state for new account
+                  setNeedsBackendRestart(true); // Mark that backend is restarting
+
+                  authStore.logout();
+                  navigate('/login');
                 }}
-              />
+              >
+                <LogOut className="h-4 w-4 text-button-tertiery-text-default" />
+                {t('setting.log-out')}
+              </Button>
             </div>
           </div>
-          <div className="flex items-center gap-sm">
-            <Button
-              onClick={() => {
-                window.location.href = `https://www.eigent.ai/dashboard?email=${authStore.email}`;
-              }}
-              variant="primary"
-              size="sm"
-            >
-              <Settings className="h-4 w-4 text-button-primary-icon-default" />
-              {t('setting.manage')}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                chatStore.clearTasks();
-
-                resetInstallation(); // Reset installation state for new account
-                setNeedsBackendRestart(true); // Mark that backend is restarting
-
-                authStore.logout();
-                navigate('/login');
-              }}
-            >
-              <LogOut className="h-4 w-4 text-button-tertiery-text-default" />
-              {t('setting.log-out')}
-            </Button>
-          </div>
+          {showLocalProfilePanel && (
+            <div className="mt-4 rounded-xl border border-border-secondary bg-surface-tertiary px-4 py-3">
+              <div className="text-body-sm font-medium text-text-heading">
+                Esta cuenta se gestiona localmente en RISKCARE.
+              </div>
+              <div className="mt-1 text-sm text-text-secondary">
+                Ya no te redirige a Eigent. Cuando definas una URL de perfil de
+                RISKCARE, este boton tambien podra abrir esa pagina sin tocar el
+                resto de la app.
+              </div>
+              <div className="mt-3 flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCopyEmail}
+                  disabled={!authStore.email}
+                >
+                  Copiar correo
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Language Section */}
@@ -439,5 +490,3 @@ export default function SettingGeneral() {
     </div>
   );
 }
-
-

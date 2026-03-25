@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,7 +10,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 import { fetchPost } from '@/api/http';
 import githubIcon from '@/assets/github.svg';
@@ -35,15 +35,7 @@ import { Textarea } from '@/components/ui/textarea';
 import useChatStoreAdapter from '@/hooks/useChatStoreAdapter';
 import { INIT_PROVODERS } from '@/lib/llm';
 import { useAuthStore, useWorkerList } from '@/store/authStore';
-import {
-  Bot,
-  ChevronDown,
-  ChevronUp,
-  Edit,
-  Eye,
-  EyeOff,
-  Plus,
-} from 'lucide-react';
+import { Bot, ChevronDown, ChevronUp, Edit, Eye, EyeOff } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ToolSelect from './ToolSelect';
@@ -73,17 +65,25 @@ interface McpItem {
 export function AddWorker({
   edit = false,
   workerInfo = null,
+  variant: _variant = 'default',
+  isOpen,
+  onOpenChange,
 }: {
   edit?: boolean;
   workerInfo?: Agent | null;
+  variant?: 'default' | 'icon';
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
   const { t } = useTranslation();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const { chatStore, projectStore } = useChatStoreAdapter();
+  const [internalOpen, setInternalOpen] = useState(false);
 
-  const activeProjectId = projectStore.activeProjectId;
-  const activeTaskId = chatStore.activeTaskId;
-  const tasks = chatStore.tasks;
+  // Use controlled state if provided, otherwise internal state
+  const isControlled =
+    typeof isOpen !== 'undefined' && typeof onOpenChange !== 'undefined';
+  const dialogOpen = isControlled ? isOpen : internalOpen;
+  const setDialogOpen = isControlled ? onOpenChange : setInternalOpen;
+  const { chatStore, projectStore } = useChatStoreAdapter();
   const [showEnvConfig, setShowEnvConfig] = useState(false);
   const [activeMcp, setActiveMcp] = useState<McpItem | null>(null);
   const [envValues, setEnvValues] = useState<{ [key: string]: EnvValue }>({});
@@ -109,6 +109,14 @@ export function AddWorker({
   const [useCustomModel, setUseCustomModel] = useState(false);
   const [customModelPlatform, setCustomModelPlatform] = useState('');
   const [customModelType, setCustomModelType] = useState('');
+
+  if (!chatStore) {
+    return null;
+  }
+
+  const activeProjectId = projectStore.activeProjectId;
+  const activeTaskId = chatStore.activeTaskId;
+  const tasks = chatStore.tasks;
 
   // environment variable management
   const initializeEnvValues = (mcp: McpItem) => {
@@ -415,7 +423,7 @@ export function AddWorker({
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <form>
         <DialogTrigger asChild>
-          {edit ? (
+          {edit && (
             <Button
               variant="ghost"
               size="sm"
@@ -430,13 +438,6 @@ export function AddWorker({
             >
               <Edit size={16} />
               {t('workforce.edit')}
-            </Button>
-          ) : (
-            <Button onClick={() => setDialogOpen(true)} variant="ghost">
-              <Plus className="h-6 w-6 text-icon-primary" />
-              <span className="text-[13px] font-bold leading-13 text-text-body">
-                {t('workforce.new-worker')}
-              </span>
             </Button>
           )}
         </DialogTrigger>
@@ -703,5 +704,3 @@ export function AddWorker({
     </Dialog>
   );
 }
-
-

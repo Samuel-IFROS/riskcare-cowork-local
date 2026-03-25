@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,7 +10,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 import { fetchPut } from '@/api/http';
 import useChatStoreAdapter from '@/hooks/useChatStoreAdapter';
@@ -31,7 +31,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { TaskState } from '../TaskState';
 import { Button } from '../ui/button';
 
-export default function Home() {
+export default function BrowserAgentWorkspace() {
   //Get Chatstore for the active project's task
   const { chatStore, projectStore } = useChatStoreAdapter();
 
@@ -88,15 +88,15 @@ export default function Home() {
   // Extract complex expressions to avoid lint error in dependency array
   const activeTaskId = chatStore?.activeTaskId as string;
   const taskAssigning = chatStore?.tasks[activeTaskId]?.taskAssigning;
-  const activeWorkSpace = chatStore?.tasks[activeTaskId]?.activeWorkSpace;
+  const activeWorkspace = chatStore?.tasks[activeTaskId]?.activeWorkspace;
 
-  // Derive activeAgent from taskAssigning and activeWorkSpace (no setState in effect)
+  // Derive activeAgent from taskAssigning and activeWorkspace (no setState in effect)
   const activeAgent = useMemo(() => {
     if (!taskAssigning) return null;
     return (
-      taskAssigning.find((item) => item.agent_id === activeWorkSpace) ?? null
+      taskAssigning.find((item) => item.agent_id === activeWorkspace) ?? null
     );
-  }, [taskAssigning, activeWorkSpace]);
+  }, [taskAssigning, activeWorkspace]);
 
   const [isTakeControl, setIsTakeControl] = useState(false);
 
@@ -192,16 +192,16 @@ export default function Home() {
     </div>
   ) : (
     <div
-      className={`flex h-[calc(100vh-104px)] w-full flex-1 items-center justify-center transition-all duration-300 ease-in-out`}
+      className={`flex h-full w-full flex-1 items-center justify-center transition-all duration-300 ease-in-out`}
     >
-      <div className="relative flex h-full w-full flex-col overflow-hidden rounded-2xl bg-menutabs-bg-default">
+      <div className="blur-bg relative flex h-full w-full flex-col overflow-hidden rounded-xl bg-surface-secondary">
         <div className="flex flex-shrink-0 items-center justify-between rounded-t-2xl px-2 pb-2 pt-3">
           <div className="flex items-center justify-start gap-sm">
             <Button
               size="icon"
               variant="ghost"
               onClick={() => {
-                chatStore.setActiveWorkSpace(
+                chatStore.setActiveWorkspace(
                   chatStore.activeTaskId as string,
                   'workflow'
                 );
@@ -419,5 +419,3 @@ export default function Home() {
     </div>
   );
 }
-
-

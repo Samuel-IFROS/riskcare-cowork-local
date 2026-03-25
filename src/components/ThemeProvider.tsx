@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,8 +10,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
+import riskcareIcon from '@/assets/logo/icon_black.png';
+import riskcareIconWhite from '@/assets/logo/icon_white.png';
 import { useAuthStore } from '@/store/authStore';
 import { useEffect } from 'react';
 
@@ -39,12 +41,28 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         root.setAttribute('data-theme', 'dark');
     }
 
+    const faviconHref =
+      appearance === 'light' ? riskcareIcon : riskcareIconWhite;
+    let favicon = document.querySelector<HTMLLinkElement>(
+      'link[data-riskcare-favicon="true"]'
+    );
+
+    if (!favicon) {
+      favicon = document.createElement('link');
+      favicon.rel = 'icon';
+      favicon.type = 'image/png';
+      favicon.setAttribute('data-riskcare-favicon', 'true');
+      document.head.appendChild(favicon);
+    }
+
+    favicon.href = faviconHref;
+
     // Keep native window icon synced with app theme (Win/Linux).
     if (window?.electronAPI?.setWindowThemeIcon) {
       void window.electronAPI
         .setWindowThemeIcon(appearance)
         .catch((error: unknown) => {
-        console.warn('[THEME] Failed to sync window icon:', error);
+          console.warn('[THEME] Failed to sync window icon:', error);
         });
     }
   }, [appearance]);
@@ -68,5 +86,3 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   return <>{children}</>;
 }
-
-

@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,7 +10,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 import * as React from 'react';
@@ -57,29 +57,46 @@ interface TooltipSimpleProps extends Omit<
 > {
   children: React.ReactNode;
   content: React.ReactNode;
+  delayDuration?: number;
+  enabled?: boolean;
 }
 
 const TooltipSimple = React.forwardRef<
   React.ElementRef<typeof TooltipContent>,
   TooltipSimpleProps
->(({ children, content, className, sideOffset = 4, ...props }, ref) => {
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>{children}</TooltipTrigger>
+>(
+  (
+    {
+      children,
+      content,
+      className,
+      sideOffset = 4,
+      delayDuration = 700,
+      enabled = true,
+      ...props
+    },
+    ref
+  ) => {
+    return (
+      <TooltipProvider delayDuration={delayDuration}>
+        <Tooltip>
+          <TooltipTrigger asChild>{children}</TooltipTrigger>
 
-        <TooltipContent
-          ref={ref}
-          sideOffset={sideOffset}
-          className={cn(className)}
-          {...props}
-        >
-          {content}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-});
+          {enabled && (
+            <TooltipContent
+              ref={ref}
+              sideOffset={sideOffset}
+              className={cn(className)}
+              {...props}
+            >
+              {content}
+            </TooltipContent>
+          )}
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
+);
 TooltipSimple.displayName = 'TooltipSimple';
 
 export {
@@ -89,5 +106,3 @@ export {
   TooltipSimple,
   TooltipTrigger,
 };
-
-

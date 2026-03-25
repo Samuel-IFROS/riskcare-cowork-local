@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,14 +10,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 const EnvOauthInfoMap = {
   notion: 'NOTION_TOKEN',
 };
 
 export class OAuth {
-  public client_name: string = 'Riskcare cowork';
+  public client_name: string = 'Eigent';
   public client_uri: string = 'https://eigent.ai/';
   public redirect_uris: string[] = [];
 
@@ -279,5 +279,3 @@ export const mcpMap: Record<string, any> = {
     provider: 'notion',
   },
 };
-
-

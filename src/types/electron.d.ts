@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,7 +10,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 interface IpcRenderer {
   getPlatform: () => string;
@@ -27,7 +27,6 @@ interface ElectronAPI {
   minimizeWindow: () => void;
   toggleMaximizeWindow: () => void;
   isFullScreen: () => Promise<boolean>;
-  setWindowThemeIcon: (appearance: string) => Promise<{ success: boolean }>;
   selectFile: (options?: any) => Promise<{
     success: boolean;
     files?: Array<{
@@ -37,6 +36,17 @@ interface ElectronAPI {
     fileCount?: number;
     canceled?: boolean;
   }>;
+  processDroppedFiles: (
+    fileData: Array<{ name: string; path?: string }>
+  ) => Promise<{
+    success: boolean;
+    files?: Array<{
+      filePath: string;
+      fileName: string;
+    }>;
+    error?: string;
+  }>;
+  getPathForFile: (file: File) => string;
   triggerMenuAction: (action: string) => void;
   onExecuteAction: (callback: (action: string) => void) => void;
   getPlatform: () => string;
@@ -135,6 +145,87 @@ interface ElectronAPI {
     folderPath: string,
     ide: string
   ) => Promise<{ success: boolean; error?: string }>;
+  // Skills (~/.eigent/skills)
+  getSkillsDir: () => Promise<{
+    success: boolean;
+    path?: string;
+    error?: string;
+  }>;
+  skillsScan: () => Promise<{
+    success: boolean;
+    skills?: Array<{
+      name: string;
+      description: string;
+      path: string;
+      scope: string;
+      skillDirName: string;
+      isExample: boolean;
+    }>;
+    error?: string;
+  }>;
+  skillWrite: (
+    skillDirName: string,
+    content: string
+  ) => Promise<{ success: boolean; error?: string }>;
+  skillDelete: (
+    skillDirName: string
+  ) => Promise<{ success: boolean; error?: string }>;
+  skillRead: (
+    filePath: string
+  ) => Promise<{ success: boolean; content?: string; error?: string }>;
+  skillListFiles: (
+    skillDirName: string
+  ) => Promise<{ success: boolean; files?: string[]; error?: string }>;
+  skillImportZip: (
+    zipPathOrBuffer: string | ArrayBuffer,
+    replacements?: string[]
+  ) => Promise<{
+    success: boolean;
+    error?: string;
+    conflicts?: Array<{ folderName: string; skillName: string }>;
+  }>;
+  openSkillFolder: (
+    skillName: string
+  ) => Promise<{ success: boolean; error?: string }>;
+  skillConfigInit: (
+    userId: string
+  ) => Promise<{ success: boolean; config?: any; error?: string }>;
+  skillConfigLoad: (
+    userId: string
+  ) => Promise<{ success: boolean; config?: any; error?: string }>;
+  skillConfigToggle: (
+    userId: string,
+    skillName: string,
+    enabled: boolean
+  ) => Promise<{ success: boolean; config?: any; error?: string }>;
+  skillConfigUpdate: (
+    userId: string,
+    skillName: string,
+    skillConfig: any
+  ) => Promise<{ success: boolean; error?: string }>;
+  skillConfigDelete: (
+    userId: string,
+    skillName: string
+  ) => Promise<{ success: boolean; error?: string }>;
+  setBrowserPort: (port: number, isExternal?: boolean) => Promise<any>;
+  getBrowserPort: () => Promise<number>;
+  getCdpBrowsers: () => Promise<any[]>;
+  addCdpBrowser: (
+    port: number,
+    isExternal: boolean,
+    name?: string
+  ) => Promise<{ success: boolean; browser?: any; error?: string }>;
+  removeCdpBrowser: (
+    browserId: string,
+    closeBrowser?: boolean
+  ) => Promise<{ success: boolean; browser?: any; error?: string }>;
+  onCdpPoolChanged: (callback: (browsers: any[]) => void) => () => void;
+  launchCdpBrowser: () => Promise<{
+    success: boolean;
+    port?: number;
+    data?: any;
+    error?: string;
+  }>;
 }
 
 declare global {
@@ -143,5 +234,3 @@ declare global {
     electronAPI: ElectronAPI;
   }
 }
-
-

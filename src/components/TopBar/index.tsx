@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,20 +10,18 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
-import {
-  fetchDelete,
-  fetchPut,
-  proxyFetchDelete,
-} from '@/api/http';
-import riskcareIcon from '@/assets/logo/eigent_icon.png';
-import riskcareIconWhite from '@/assets/logo/eigent_icon_white.png';
+import { fetchDelete, fetchPut, proxyFetchDelete } from '@/api/http';
+import riskcareLogo from '@/assets/logo/logo_black.png';
+import riskcareLogoWhite from '@/assets/logo/logo_white.png';
+import riskcareSymbol from '@/assets/logo/riskcare_symbol.png';
 import EndNoticeDialog from '@/components/Dialog/EndNotice';
 import { Button } from '@/components/ui/button';
 import { TooltipSimple } from '@/components/ui/tooltip';
 import useChatStoreAdapter from '@/hooks/useChatStoreAdapter';
 import { share } from '@/lib/share';
+import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/authStore';
 import { useInstallationUI } from '@/store/installationStore';
 import { useSidebarStore } from '@/store/sidebarStore';
@@ -38,15 +36,51 @@ import {
   Plus,
   Power,
   Settings,
+  Square,
   Stethoscope,
   Sun,
-  Square,
   X,
 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+
+function RiskcareHeaderMark({
+  isDarkTheme,
+  className,
+}: {
+  isDarkTheme: boolean;
+  className?: string;
+}) {
+  return (
+    <span
+      aria-hidden="true"
+      className={cn(
+        'inline-flex shrink-0 items-center justify-center rounded-[10px] border shadow-sm transition-colors',
+        isDarkTheme
+          ? 'border-white/10 shadow-black/30 bg-[#0f172a]'
+          : 'shadow-sky-200/70 border-[#bfdcff] bg-[#f8fbff]',
+        className
+      )}
+    >
+      <span
+        className="block h-[72%] w-[72%]"
+        style={{
+          backgroundColor: isDarkTheme ? '#f8fbff' : '#17138d',
+          maskImage: `url(${riskcareSymbol})`,
+          WebkitMaskImage: `url(${riskcareSymbol})`,
+          maskRepeat: 'no-repeat',
+          WebkitMaskRepeat: 'no-repeat',
+          maskPosition: 'center',
+          WebkitMaskPosition: 'center',
+          maskSize: 'contain',
+          WebkitMaskSize: 'contain',
+        }}
+      />
+    </span>
+  );
+}
 
 function HeaderWin() {
   const { t } = useTranslation();
@@ -65,17 +99,47 @@ function HeaderWin() {
   const { isInstalling, installationState } = useInstallationUI();
   const _isInstallationActive =
     isInstalling || installationState === 'waiting-backend';
+  const [wordmarkLoadFailed, setWordmarkLoadFailed] = useState(false);
 
   useEffect(() => {
     const p = window.electronAPI.getPlatform();
     setPlatform(p);
   }, []);
-  const logoSrc = appearance === 'dark' ? riskcareIconWhite : riskcareIcon;
+  const wordmarkSrc = appearance === 'dark' ? riskcareLogoWhite : riskcareLogo;
   const isDarkTheme = appearance !== 'light';
+
+  useEffect(() => {
+    setWordmarkLoadFailed(false);
+  }, [wordmarkSrc]);
 
   const toggleAppearance = () => {
     setAppearance(isDarkTheme ? 'light' : 'dark');
   };
+  const isClinicalRoute = location.pathname.startsWith('/clinical');
+  const goToHome = () => {
+    navigate('/', { replace: true });
+    if (window.location.hash !== '#/') {
+      window.location.hash = '#/';
+    }
+  };
+  const handleClinicalShortcut = () => {
+    if (isClinicalRoute) {
+      goToHome();
+      return;
+    }
+
+    navigate('/clinical');
+    if (window.location.hash !== '#/clinical') {
+      window.location.hash = '#/clinical';
+    }
+  };
+  const clinicalTooltip = isClinicalRoute
+    ? t('layout.home')
+    : 'Gestión clínica';
+
+  const effectiveClinicalTooltip = isClinicalRoute
+    ? t('layout.home')
+    : 'Gestion clinica';
 
   const exportLog = async () => {
     try {
@@ -200,10 +264,20 @@ function HeaderWin() {
     >
       {/* left */}
       {platform !== 'darwin' && (
-        <div className="no-drag flex w-[170px] items-center justify-center">
-          <span className="text-label-md font-bold text-text-heading">
-            Riskcare cowork
-          </span>
+        <div className="no-drag flex w-[210px] items-center justify-start gap-2 pl-2">
+          <RiskcareHeaderMark isDarkTheme={isDarkTheme} className="h-5 w-5" />
+          {wordmarkLoadFailed ? (
+            <span className="text-primary text-sm font-semibold tracking-[0.18em]">
+              RISKCARE
+            </span>
+          ) : (
+            <img
+              src={wordmarkSrc}
+              alt="Riskcare"
+              className="h-5 w-auto object-contain"
+              onError={() => setWordmarkLoadFailed(true)}
+            />
+          )}
         </div>
       )}
 
@@ -217,7 +291,10 @@ function HeaderWin() {
               size="icon"
               className="no-drag h-6 w-6 p-0"
             >
-              <img className="h-6 w-6" src={logoSrc} alt="folder-icon" />
+              <RiskcareHeaderMark
+                isDarkTheme={isDarkTheme}
+                className="h-6 w-6"
+              />
             </Button>
           </div>
           {location.pathname === '/history' && (
@@ -249,7 +326,7 @@ function HeaderWin() {
                 </Button>
               </TooltipSimple>
               <TooltipSimple
-                content="Gestión Clínica"
+                content={effectiveClinicalTooltip || clinicalTooltip}
                 side="bottom"
                 align="center"
               >
@@ -257,7 +334,7 @@ function HeaderWin() {
                   variant="ghost"
                   size="icon"
                   className="no-drag"
-                  onClick={() => navigate('/clinical')}
+                  onClick={handleClinicalShortcut}
                 >
                   <Stethoscope className="h-4 w-4" />
                 </Button>
@@ -472,5 +549,3 @@ function HeaderWin() {
 }
 
 export default HeaderWin;
-
-

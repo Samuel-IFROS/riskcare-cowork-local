@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,9 +10,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
-import { getStoredLanguage, setStoredLanguage } from '@/lib/authStorage';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { resources } from './locales';
@@ -33,86 +32,69 @@ export enum LocaleEnum {
 
 export type LanguagePreference = LocaleEnum | 'system';
 
-const BRAND_NAME = 'Riskcare cowork';
-const BRAND_TOKEN_PATTERN =
-  /(^|[^A-Za-z0-9@.:-])(eigent)(?=[^A-Za-z0-9@.:-]|$)/gi;
-const AVAILABLE_LANGUAGES = Object.values(LocaleEnum);
-
-const replaceBrandToken = (value: string) =>
-  value.replace(BRAND_TOKEN_PATTERN, (_match, prefix: string) => {
-    return `${prefix}${BRAND_NAME}`;
-  });
-
-const normalizeLanguage = (language: string): string =>
-  language.trim().toLowerCase();
-
-const findSupportedLocale = (language: string): LocaleEnum | null => {
-  const normalized = normalizeLanguage(language);
-
-  const exactMatch = AVAILABLE_LANGUAGES.find(
-    (locale) => normalizeLanguage(locale) === normalized
-  );
-  if (exactMatch) return exactMatch as LocaleEnum;
-
-  const primaryCode = normalized.split('-')[0];
-  const byPrimaryCode = AVAILABLE_LANGUAGES.find(
-    (locale) => normalizeLanguage(locale).split('-')[0] === primaryCode
-  );
-  return (byPrimaryCode as LocaleEnum | undefined) ?? null;
-};
-
-const resolveSystemLocale = (): LocaleEnum => {
-  if (typeof navigator === 'undefined' || !navigator.language) {
-    return LocaleEnum.English;
-  }
-  return findSupportedLocale(navigator.language) ?? LocaleEnum.English;
-};
-
-const resolveLanguage = (language?: string | null): LocaleEnum => {
-  if (!language || normalizeLanguage(language) === 'system') {
-    return resolveSystemLocale();
-  }
-  return findSupportedLocale(language) ?? resolveSystemLocale();
-};
-
-const initializeI18n = () => {
-  const initialLanguage = resolveLanguage(getStoredLanguage());
-
+const getPersistedLanguage = () => {
   try {
-    i18n
-      .use({
-        type: 'postProcessor',
-        name: 'brandName',
-        process(value: unknown) {
-          if (typeof value !== 'string') {
-            return value as string;
-          }
-          return replaceBrandToken(value);
-        },
-      })
-      .use(initReactI18next)
-      .init({
-        resources,
-        fallbackLng: LocaleEnum.English,
-        lng: initialLanguage,
-        postProcess: ['brandName'],
-        interpolation: {
-          escapeValue: false,
-        },
-      });
-  } catch (error) {
-    console.error('[i18n] Failed to initialize:', error);
+    const raw = localStorage.getItem('auth-storage');
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw);
+    return parsed?.state?.language?.toLowerCase?.() ?? null;
+  } catch (_error) {
+    return null;
   }
 };
 
-initializeI18n();
+const savedLanguage = getPersistedLanguage();
+const systemLanguage = navigator.language.toLowerCase();
+const availableLanguages = Object.values(LocaleEnum);
+
+let initialLanguage: string;
+
+if (savedLanguage && availableLanguages.includes(savedLanguage as LocaleEnum)) {
+  initialLanguage = savedLanguage;
+} else {
+  const matched = availableLanguages.find((lang) =>
+    systemLanguage.startsWith(lang)
+  );
+  initialLanguage = matched || LocaleEnum.English;
+}
+
+export const resolvePreferredLanguage = (
+  language: LanguagePreference
+): LocaleEnum => {
+  if (language !== 'system') {
+    return language;
+  }
+
+  const runtimeSystemLanguage = navigator.language.toLowerCase();
+  const matched = availableLanguages.find((lang) =>
+    runtimeSystemLanguage.startsWith(lang.toLowerCase())
+  );
+
+  return matched || LocaleEnum.English;
+};
+
+i18n.use(initReactI18next).init({
+  resources,
+  fallbackLng: LocaleEnum.English,
+  lng: initialLanguage,
+  interpolation: {
+    escapeValue: false,
+  },
+});
 
 export const switchLanguage = (language: LanguagePreference) => {
-  const nextLanguage = resolveLanguage(language);
-  void i18n.changeLanguage(nextLanguage);
-  setStoredLanguage(language);
+  const resolvedLanguage = resolvePreferredLanguage(language);
+
+  console.log('switchLanguage', language, '->', resolvedLanguage);
+  i18n.changeLanguage(resolvedLanguage);
+  import('@/store/authStore')
+    .then(({ getAuthStore }) => {
+      getAuthStore().setLanguage(language);
+    })
+    .catch((error) => {
+      console.warn('Failed to persist language change:', error);
+    });
 };
 
 export default i18n;
-
-

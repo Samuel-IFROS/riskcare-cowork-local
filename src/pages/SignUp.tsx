@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,7 +10,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/store/authStore';
@@ -24,8 +24,8 @@ import background from '@/assets/background.png';
 import eyeOff from '@/assets/eye-off.svg';
 import eye from '@/assets/eye.svg';
 import google from '@/assets/google.svg';
-import eigentLogo from '@/assets/logo/eigent_icon.png';
-import eigentLogoWhite from '@/assets/logo/eigent_icon_white.png';
+import riskcareLogo from '@/assets/logo/logo_black.png';
+import riskcareLogoWhite from '@/assets/logo/logo_white.png';
 import WindowControls from '@/components/WindowControls';
 import {
   SUPABASE_GOOGLE_PKCE_KEY,
@@ -33,11 +33,11 @@ import {
   buildGooglePkceVerifier,
   buildSupabaseGoogleAuthorizeUrl,
   hasSupabaseAuthConfig,
+  subscribeRiskcareRuntimeConfig,
 } from '@/lib/supabaseAuth';
 import { loadCoworkWorkers } from '@/service/coworkWorkers';
 import { useTranslation } from 'react-i18next';
 
-const HAS_SUPABASE_AUTH = hasSupabaseAuthConfig();
 const extractAuthToken = (data: any): string | null => {
   if (typeof data?.token !== 'string') return null;
   const token = data.token.trim();
@@ -45,8 +45,13 @@ const extractAuthToken = (data: any): string | null => {
 };
 let lock = false;
 export default function SignUp() {
-  const { setAuth, setModelType, setLocalProxyValue, setWorkerList } =
-    useAuthStore();
+  const {
+    setAuth,
+    setModelType,
+    setCloudModelType,
+    setLocalProxyValue,
+    setWorkerList,
+  } = useAuthStore();
   const appearance = useAuthStore((state) => state.appearance);
   const navigate = useNavigate();
   const location = useLocation();
@@ -66,7 +71,10 @@ export default function SignUp() {
   const [generalError, setGeneralError] = useState('');
   const titlebarRef = useRef<HTMLDivElement | null>(null);
   const [platform, setPlatform] = useState<string>('');
-  const logoSrc = appearance === 'dark' ? eigentLogoWhite : eigentLogo;
+  const [hasSupabaseAuth, setHasSupabaseAuth] = useState(() =>
+    hasSupabaseAuthConfig()
+  );
+  const logoSrc = appearance === 'dark' ? riskcareLogoWhite : riskcareLogo;
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -167,7 +175,8 @@ export default function SignUp() {
         ? data.workers
         : await loadCoworkWorkers(authToken);
       setWorkerList(workers);
-      setModelType('custom');
+      setModelType('cloud');
+      setCloudModelType('gemini-3-pro-preview');
       const localProxyValue = import.meta.env.VITE_USE_LOCAL_PROXY || null;
       setLocalProxyValue(localProxyValue);
       navigate('/');
@@ -223,7 +232,8 @@ export default function SignUp() {
             : await loadCoworkWorkers(authToken);
           setWorkerList(workers);
         }
-        setModelType('custom');
+        setModelType('cloud');
+        setCloudModelType('gemini-3-pro-preview');
         const localProxyValue = import.meta.env.VITE_USE_LOCAL_PROXY || null;
         setLocalProxyValue(localProxyValue);
         navigate('/');
@@ -244,6 +254,7 @@ export default function SignUp() {
       setGeneralError,
       setIsLoading,
       setLocalProxyValue,
+      setCloudModelType,
       setModelType,
       setWorkerList,
       t,
@@ -251,7 +262,7 @@ export default function SignUp() {
   );
 
   const handleGoogleSignUp = useCallback(async () => {
-    if (!HAS_SUPABASE_AUTH) {
+    if (!hasSupabaseAuth) {
       setGeneralError('Supabase OAuth is not configured.');
       return;
     }
@@ -267,7 +278,7 @@ export default function SignUp() {
       console.error('Failed to start Google OAuth:', error);
       setGeneralError(t('layout.sign-up-failed-please-try-again'));
     }
-  }, [setGeneralError, t]);
+  }, [hasSupabaseAuth, setGeneralError, t]);
 
   const handleAuthCode = useCallback(
     async (_event: any, code: string) => {
@@ -298,6 +309,13 @@ export default function SignUp() {
     if (p === 'darwin') {
       titlebarRef.current?.classList.add('mac');
     }
+  }, []);
+
+  useEffect(() => {
+    setHasSupabaseAuth(hasSupabaseAuthConfig());
+    return subscribeRiskcareRuntimeConfig(() => {
+      setHasSupabaseAuth(hasSupabaseAuthConfig());
+    });
   }, []);
 
   return (
@@ -361,7 +379,7 @@ export default function SignUp() {
                 {t('layout.login')}
               </Button>
             </div>
-            {HAS_SUPABASE_AUTH && (
+            {hasSupabaseAuth && (
               <div className="w-full pt-6">
                 <Button
                   variant="primary"
@@ -377,7 +395,7 @@ export default function SignUp() {
                 </Button>
               </div>
             )}
-            {HAS_SUPABASE_AUTH && (
+            {hasSupabaseAuth && (
               <div className="mb-6 mt-2 w-full text-center font-inter text-[15px] font-medium leading-[22px] text-[#222]">
                 {t('layout.or')}
               </div>

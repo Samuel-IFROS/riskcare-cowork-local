@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,7 +10,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 import { VanillaChatStore } from '@/store/chatStore';
 import { AgentStep, ChatTaskStatus } from '@/types/constants';
@@ -24,6 +24,7 @@ import React, {
 } from 'react';
 import { AgentMessageCard } from './MessageItem/AgentMessageCard';
 import { NoticeCard } from './MessageItem/NoticeCard';
+import { TaskCompletionCard } from './MessageItem/TaskCompletionCard';
 import { UserMessageCard } from './MessageItem/UserMessageCard';
 import { StreamingTaskList } from './TaskBox/StreamingTaskList';
 import { TaskCard } from './TaskBox/TaskCard';
@@ -56,6 +57,7 @@ export const UserQueryGroup: React.FC<UserQueryGroupProps> = ({
   const groupRef = useRef<HTMLDivElement>(null);
   const taskBoxRef = useRef<HTMLDivElement>(null);
   const [_isTaskBoxSticky, setIsTaskBoxSticky] = useState(false);
+  const [isCompletionReady, setIsCompletionReady] = useState(false);
   const chatState = chatStore.getState();
   const activeTaskId = chatState.activeTaskId;
 
@@ -121,6 +123,11 @@ export const UserQueryGroup: React.FC<UserQueryGroupProps> = ({
     (queryGroup.taskMessage || shouldShowFallbackTask) && activeTaskId
       ? chatState.tasks[activeTaskId]
       : null;
+
+  // Reset completion flag when active task or query group changes
+  useEffect(() => {
+    setIsCompletionReady(false);
+  }, [activeTaskId, queryGroup.queryId]);
 
   // Set up intersection observer for this query group
   useEffect(() => {
@@ -216,7 +223,7 @@ export const UserQueryGroup: React.FC<UserQueryGroupProps> = ({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="py-sm pl-sm"
+          className="px-sm py-sm"
         >
           <UserMessageCard
             id={queryGroup.userMessage.id}
@@ -295,7 +302,7 @@ export const UserQueryGroup: React.FC<UserQueryGroupProps> = ({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="flex flex-col gap-4 pl-3"
+                className="flex flex-col gap-4 px-sm"
               >
                 <AgentMessageCard
                   typewriter={
@@ -304,11 +311,14 @@ export const UserQueryGroup: React.FC<UserQueryGroupProps> = ({
                   }
                   id={message.id}
                   content={message.content}
-                  onTyping={() => {}}
+                  onTyping={() => {
+                    // Mark completion once the final END message finishes typing
+                    setIsCompletionReady(true);
+                  }}
                 />
                 {/* File List */}
                 {message.fileList && (
-                  <div className="flex flex-wrap gap-2 pl-3">
+                  <div className="flex flex-wrap gap-2">
                     {message.fileList.map((file: any, fileIndex: number) => (
                       <motion.div
                         key={`file-${message.id}-${file.name}-${fileIndex}`}
@@ -320,7 +330,7 @@ export const UserQueryGroup: React.FC<UserQueryGroupProps> = ({
                             activeTaskId as string,
                             file
                           );
-                          chatState.setActiveWorkSpace(
+                          chatState.setActiveWorkspace(
                             activeTaskId as string,
                             'documentWorkSpace'
                           );
@@ -339,6 +349,21 @@ export const UserQueryGroup: React.FC<UserQueryGroupProps> = ({
                     ))}
                   </div>
                 )}
+                {/* Task Completion Action Card - show only after markdown typing completes */}
+                {task?.status === 'finished' && isCompletionReady && (
+                  <TaskCompletionCard
+                    taskPrompt={queryGroup.userMessage?.content}
+                    onRerun={() => {
+                      // Focus the input for task refinement
+                      const inputElement = document.querySelector(
+                        '[data-chat-input]'
+                      ) as HTMLInputElement;
+                      if (inputElement) {
+                        inputElement.focus();
+                      }
+                    }}
+                  />
+                )}
               </motion.div>
             );
           } else if (message.content === 'skip') {
@@ -348,7 +373,7 @@ export const UserQueryGroup: React.FC<UserQueryGroupProps> = ({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="flex flex-col gap-4 pl-3"
+                className="flex flex-col gap-4 px-sm"
               >
                 <AgentMessageCard
                   key={message.id}
@@ -365,7 +390,7 @@ export const UserQueryGroup: React.FC<UserQueryGroupProps> = ({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="flex flex-col gap-4 pl-3"
+                className="flex flex-col gap-4 px-sm"
               >
                 <AgentMessageCard
                   key={message.id}
@@ -388,7 +413,7 @@ export const UserQueryGroup: React.FC<UserQueryGroupProps> = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="flex flex-col gap-4 pl-3"
+              className="flex flex-col gap-4 px-sm"
             >
               {message.fileList && (
                 <div className="flex flex-wrap gap-2">
@@ -400,7 +425,7 @@ export const UserQueryGroup: React.FC<UserQueryGroupProps> = ({
                       transition={{ delay: 0.3 }}
                       onClick={() => {
                         chatState.setSelectedFile(activeTaskId as string, file);
-                        chatState.setActiveWorkSpace(
+                        chatState.setActiveWorkspace(
                           activeTaskId as string,
                           'documentWorkSpace'
                         );
@@ -458,5 +483,3 @@ export const UserQueryGroup: React.FC<UserQueryGroupProps> = ({
     </motion.div>
   );
 };
-
-

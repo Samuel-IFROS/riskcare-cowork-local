@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,9 +10,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
-import { getStoredAuthEmail, getStoredAuthToken } from './authStorage';
+import { getAuthStore } from '@/store/authStore';
 
 export function getProxyBaseURL() {
   const isDev = import.meta.env.DEV;
@@ -68,35 +68,29 @@ export function capitalizeFirstLetter(input: string): string {
 }
 
 export function hasStackKeys() {
-  const stackProjectId = import.meta.env.VITE_STACK_PROJECT_ID;
-  const stackPublishableKey = import.meta.env.VITE_STACK_PUBLISHABLE_CLIENT_KEY;
-  const stackSecretKey = import.meta.env.VITE_STACK_SECRET_SERVER_KEY;
-
-  const isPlaceholder = (value?: string) =>
-    !value || value.trim() === '' || value.toLowerCase().includes('dummy');
-
   return (
-    !isPlaceholder(stackProjectId) &&
-    !isPlaceholder(stackPublishableKey) &&
-    !isPlaceholder(stackSecretKey)
+    import.meta.env.VITE_STACK_PROJECT_ID &&
+    import.meta.env.VITE_STACK_PUBLISHABLE_CLIENT_KEY &&
+    import.meta.env.VITE_STACK_SECRET_SERVER_KEY
   );
 }
 
 // Re-export replay utilities
-export { replayActiveTask, replayProject } from './replay';
+export {
+  loadProjectFromHistory,
+  replayActiveTask,
+  replayProject,
+} from './replay';
 
 export async function uploadLog(taskId: string, type?: string | undefined) {
   if (import.meta.env.VITE_USE_LOCAL_PROXY !== 'true' && !type) {
     try {
-      const email = getStoredAuthEmail();
-      const token = getStoredAuthToken();
-      if (!email || !token) return;
-
+      const { email, token } = getAuthStore();
       const baseUrl = import.meta.env.DEV
         ? import.meta.env.VITE_PROXY_URL
         : import.meta.env.VITE_BASE_URL;
 
-      await window.electronAPI?.uploadLog?.(email, taskId, baseUrl, token);
+      await window.electronAPI.uploadLog(email, taskId, baseUrl, token);
     } catch (error) {
       console.error('Failed to upload log:', error);
     }

@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,7 +10,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 import fs from 'fs';
 import os from 'os';
@@ -18,22 +18,97 @@ import path from 'path';
 
 export const ENV_START = '# === MCP INTEGRATION ENV START ===';
 export const ENV_END = '# === MCP INTEGRATION ENV END ===';
+const EIGENT_DIR = path.join(os.homedir(), '.eigent');
+const GLOBAL_ENV_PATH = path.join(EIGENT_DIR, '.env');
+
+function ensureEigentDir() {
+  if (!fs.existsSync(EIGENT_DIR)) {
+    fs.mkdirSync(EIGENT_DIR, { recursive: true });
+  }
+}
+
+function getDefaultEnvCandidates(): string[] {
+  const candidates = [
+    typeof process.resourcesPath === 'string'
+      ? path.join(process.resourcesPath, 'backend', '.env')
+      : null,
+    typeof process.resourcesPath === 'string'
+      ? path.join(process.resourcesPath, '.env')
+      : null,
+    path.join(process.cwd(), 'backend', '.env'),
+    path.join(process.cwd(), '.env'),
+  ].filter((candidate): candidate is string => Boolean(candidate));
+
+  return [...new Set(candidates)].filter((candidate) =>
+    fs.existsSync(candidate)
+  );
+}
+
+function getBundledDefaultEnvPath(): string | null {
+  return getDefaultEnvCandidates()[0] || null;
+}
+
+function readEnvKeyFromPath(filePath: string, key: string): string | null {
+  try {
+    if (!fs.existsSync(filePath)) return null;
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const prefix = key + '=';
+    for (const line of content.split(/\r?\n/)) {
+      if (line.startsWith(prefix)) {
+        let value = line.slice(prefix.length).trim();
+        if (
+          (value.startsWith('"') && value.endsWith('"')) ||
+          (value.startsWith("'") && value.endsWith("'"))
+        ) {
+          value = value.slice(1, -1);
+        }
+        return value;
+      }
+    }
+  } catch {
+    // ignore read errors
+  }
+  return null;
+}
+
+function resolveBundledDefaultValue(...keys: string[]): string | null {
+  const envFiles = getDefaultEnvCandidates();
+
+  for (const key of keys) {
+    const processValue = process.env[key]?.trim();
+    if (processValue) {
+      return processValue;
+    }
+
+    for (const envPath of envFiles) {
+      const fileValue = readEnvKeyFromPath(envPath, key)?.trim();
+      if (fileValue) {
+        return fileValue;
+      }
+    }
+  }
+
+  return null;
+}
+
+export function getGlobalEnvPath() {
+  ensureEigentDir();
+  return GLOBAL_ENV_PATH;
+}
 
 export function getEnvPath(email: string) {
   const tempEmail = email
     .split('@')[0]
     .replace(/[\\/*?:"<>|\s]/g, '_')
     .replace('.', '_');
-  const eigentDir = path.join(os.homedir(), '.eigent');
+  const eigentDir = EIGENT_DIR;
 
   // Ensure .eigent directory exists
-  if (!fs.existsSync(eigentDir)) {
-    fs.mkdirSync(eigentDir, { recursive: true });
-  }
+  ensureEigentDir();
 
   const envPath = path.join(eigentDir, '.env.' + tempEmail);
-  const defaultEnv = path.join(process.resourcesPath, 'backend', '.env');
-  if (!fs.existsSync(envPath) && fs.existsSync(defaultEnv)) {
+  const defaultEnv = getBundledDefaultEnvPath();
+  if (!fs.existsSync(envPath) && defaultEnv && fs.existsSync(defaultEnv)) {
     fs.copyFileSync(defaultEnv, envPath);
     fs.chmodSync(envPath, 0o600);
   }
@@ -93,27 +168,74 @@ export function removeEnvKey(lines: string[], key: string) {
  */
 export function readGlobalEnvKey(key: string): string | null {
   try {
-    const globalEnvPath = path.join(os.homedir(), '.eigent', '.env');
+    const globalEnvPath = getGlobalEnvPath();
     if (!fs.existsSync(globalEnvPath)) return null;
-    const content = fs.readFileSync(globalEnvPath, 'utf-8');
-    const prefix = key + '=';
-    for (const line of content.split(/\r?\n/)) {
-      if (line.startsWith(prefix)) {
-        let value = line.slice(prefix.length).trim();
-        // Strip surrounding quotes (single or double)
-        if (
-          (value.startsWith('"') && value.endsWith('"')) ||
-          (value.startsWith("'") && value.endsWith("'"))
-        ) {
-          value = value.slice(1, -1);
-        }
-        return value;
-      }
-    }
+    return readEnvKeyFromPath(globalEnvPath, key);
   } catch {
     // ignore read errors
   }
   return null;
+}
+
+export function ensureGlobalEnvDefaults(
+  defaults: Record<string, string | null | undefined>
+) {
+  const envPath = getGlobalEnvPath();
+  const lines = fs.existsSync(envPath)
+    ? fs.readFileSync(envPath, 'utf-8').split(/\r?\n/)
+    : [];
+  let changed = false;
+
+  Object.entries(defaults).forEach(([key, value]) => {
+    const normalizedValue = value?.trim();
+    if (!normalizedValue) {
+      return;
+    }
+
+    const existingValue = readEnvKeyFromPath(envPath, key)?.trim();
+    if (existingValue) {
+      return;
+    }
+
+    const prefix = key + '=';
+    const existingIndex = lines.findIndex((line) => line.startsWith(prefix));
+    if (existingIndex >= 0) {
+      lines[existingIndex] = `${key}=${normalizedValue}`;
+    } else {
+      lines.push(`${key}=${normalizedValue}`);
+    }
+    changed = true;
+  });
+
+  if (!changed) {
+    return;
+  }
+
+  const nextContent = `${lines.filter(Boolean).join('\n')}\n`;
+  fs.writeFileSync(envPath, nextContent, 'utf-8');
+  try {
+    fs.chmodSync(envPath, 0o600);
+  } catch {
+    // ignore chmod issues on platforms that don't support it
+  }
+}
+
+export function ensureRiskcareRuntimeDefaults() {
+  ensureGlobalEnvDefaults({
+    OPENAI_API_KEY: resolveBundledDefaultValue(
+      'RISKCARE_DEFAULT_CLOUD_API_KEY',
+      'OPENAI_API_KEY'
+    ),
+    OPENAI_API_BASE_URL: resolveBundledDefaultValue(
+      'RISKCARE_DEFAULT_CLOUD_BASE_URL',
+      'OPENAI_API_BASE_URL'
+    ),
+    RISKCARE_PROFILE_URL: resolveBundledDefaultValue('RISKCARE_PROFILE_URL'),
+    RISKCARE_SUPABASE_URL: resolveBundledDefaultValue('RISKCARE_SUPABASE_URL'),
+    RISKCARE_SUPABASE_PUBLISHABLE_KEY: resolveBundledDefaultValue(
+      'RISKCARE_SUPABASE_PUBLISHABLE_KEY'
+    ),
+  });
 }
 
 /**
@@ -162,5 +284,3 @@ export function getEmailFolderPath(email: string) {
 
   return { MCP_REMOTE_CONFIG_DIR, MCP_CONFIG_DIR, tempEmail, hasToken };
 }
-
-

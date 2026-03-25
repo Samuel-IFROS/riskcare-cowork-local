@@ -45,6 +45,12 @@ export default [
   // Globally ignored files and directories
   {
     ignores: [
+      '.eigent-data/**',
+      'scripts/**',
+      'resources/scripts/**',
+      'licenses/**',
+      'build-icon.js',
+      'convert-icon.js',
       // Dependencies
       'node_modules/**',
       'package/@stackframe/**',
@@ -77,6 +83,15 @@ export default [
   {
     files: ['**/*.js'],
     ...js.configs.recommended,
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        ...globals.es2021,
+      },
+    },
   },
   // Configuration for JSX files
   {

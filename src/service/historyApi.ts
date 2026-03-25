@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,10 +10,27 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 import { proxyFetchGet } from '@/api/http';
 import { HistoryTask, ProjectGroup } from '@/types/history';
+
+const normalizeProjectGroup = (
+  project: Partial<ProjectGroup>
+): ProjectGroup => ({
+  project_id: project.project_id || '',
+  project_name:
+    project.project_name || `Project ${project.project_id || ''}`.trim(),
+  total_tokens: project.total_tokens || 0,
+  task_count: project.task_count || 0,
+  total_triggers: project.total_triggers || 0,
+  latest_task_date: project.latest_task_date || new Date().toISOString(),
+  last_prompt: project.last_prompt || '',
+  tasks: Array.isArray(project.tasks) ? project.tasks : [],
+  total_completed_tasks: project.total_completed_tasks || 0,
+  total_ongoing_tasks: project.total_ongoing_tasks || 0,
+  average_tokens_per_task: project.average_tokens_per_task || 0,
+});
 
 // Group tasks by project_id and add project-level metadata
 const groupTasksByProject = (tasks: HistoryTask[]): ProjectGroup[] => {
@@ -28,6 +45,7 @@ const groupTasksByProject = (tasks: HistoryTask[]): ProjectGroup[] => {
         project_name: task.project_name || `Project ${projectId}`,
         total_tokens: 0,
         task_count: 0,
+        total_triggers: 0,
         latest_task_date: task.created_at || new Date().toISOString(),
         tasks: [],
         total_completed_tasks: 0,
@@ -104,7 +122,13 @@ export const fetchGroupedHistoryTasks = async (
     if (!res || !res.projects) {
       await fetchGroupedHistoryTasksLegacy(setProjects);
     } else {
-      setProjects(res.projects);
+      setProjects(
+        Array.isArray(res.projects)
+          ? res.projects.map((project: Partial<ProjectGroup>) =>
+              normalizeProjectGroup(project)
+            )
+          : []
+      );
     }
   } catch (error) {
     console.error(
@@ -128,7 +152,13 @@ export const fetchGroupedHistorySummaries = async (
     if (!res || !res.projects) {
       await fetchGroupedHistoryTasksLegacy(setProjects);
     } else {
-      setProjects(res.projects);
+      setProjects(
+        Array.isArray(res.projects)
+          ? res.projects.map((project: Partial<ProjectGroup>) =>
+              normalizeProjectGroup(project)
+            )
+          : []
+      );
     }
   } catch (error) {
     console.error(
@@ -160,5 +190,3 @@ export const flattenProjectTasks = (
 ): HistoryTask[] => {
   return projects.flatMap((project) => project.tasks);
 };
-
-

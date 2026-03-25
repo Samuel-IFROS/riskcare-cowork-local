@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,7 +10,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 import { Provider } from '@/types';
 
@@ -37,7 +37,7 @@ export const INIT_PROVODERS: Provider[] = [
     id: 'anthropic',
     name: 'Anthropic',
     apiKey: '',
-    apiHost: 'https://api.anthropic.com/v1/',
+    apiHost: 'https://api.anthropic.com',
     description: 'Anthropic Claude API configuration',
     is_valid: false,
     model_type: '',
@@ -106,6 +106,33 @@ export const INIT_PROVODERS: Provider[] = [
     model_type: '',
   },
   {
+    id: 'samba-nova',
+    name: 'SambaNova',
+    apiKey: '',
+    apiHost: 'https://api.sambanova.ai/v1',
+    description: 'SambaNova model configuration.',
+    is_valid: false,
+    model_type: '',
+  },
+  {
+    id: 'grok',
+    name: 'Grok',
+    apiKey: '',
+    apiHost: 'https://api.x.ai/v1',
+    description: 'Grok model configuration.',
+    is_valid: false,
+    model_type: '',
+  },
+  {
+    id: 'mistral',
+    name: 'Mistral',
+    apiKey: '',
+    apiHost: 'https://api.mistral.ai',
+    description: 'Mistral model configuration.',
+    is_valid: false,
+    model_type: '',
+  },
+  {
     id: 'aws-bedrock',
     name: 'AWS Bedrock',
     apiKey: '',
@@ -138,6 +165,15 @@ export const INIT_PROVODERS: Provider[] = [
     model_type: '',
   },
   {
+    id: 'ernie',
+    name: 'Ernie',
+    apiKey: '',
+    apiHost: 'https://qianfan.baidubce.com/v2',
+    description: 'Baidu Ernie model configuration.',
+    is_valid: false,
+    model_type: '',
+  },
+  {
     id: 'openai-compatible-model',
     name: 'OpenAI Compatible',
     apiKey: '',
@@ -148,5 +184,3 @@ export const INIT_PROVODERS: Provider[] = [
     model_type: '',
   },
 ];
-
-

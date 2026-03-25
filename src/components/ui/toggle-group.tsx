@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,7 +10,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 import * as ToggleGroupPrimitive from '@radix-ui/react-toggle-group';
 import { type VariantProps } from 'class-variance-authority';
@@ -59,6 +59,7 @@ const ToggleGroupItem = React.forwardRef<
           variant: context.variant || variant,
           size: context.size || size,
         }),
+        'border-border-disabled bg-surface-primary data-[state=on]:border-border-secondary data-[state=on]:bg-surface-tertiary',
         className
       )}
       {...props}
@@ -71,5 +72,3 @@ const ToggleGroupItem = React.forwardRef<
 ToggleGroupItem.displayName = ToggleGroupPrimitive.Item.displayName;
 
 export { ToggleGroup, ToggleGroupItem };
-
-

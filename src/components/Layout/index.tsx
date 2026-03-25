@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,9 +10,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
-import animationData from '@/assets/animation/onboarding_success.json';
+import onboardingAnimationUrl from '@/assets/animation/onboarding_success.json?url';
 import { AnimationJson } from '@/components/AnimationJson';
 import { InstallDependencies } from '@/components/InstallStep/InstallDependencies';
 import TopBar from '@/components/TopBar';
@@ -34,6 +34,8 @@ const Layout = () => {
     setInitState: _setInitState,
   } = useAuthStore();
   const [noticeOpen, setNoticeOpen] = useState(false);
+  const [onboardingAnimationData, setOnboardingAnimationData] =
+    useState<any>(null);
 
   //Get Chatstore for the active project's task
   const { chatStore } = useChatStoreAdapter();
@@ -53,9 +55,16 @@ const Layout = () => {
 
   useEffect(() => {
     const handleBeforeClose = () => {
-      const currentStatus =
-        chatStore.tasks[chatStore.activeTaskId as string]?.status;
-      if (['running', 'pause'].includes(currentStatus)) {
+      if (!chatStore) {
+        window.electronAPI.closeWindow(true);
+        return;
+      }
+
+      const activeTaskId = chatStore.activeTaskId;
+      const currentStatus = activeTaskId
+        ? chatStore.tasks[activeTaskId]?.status
+        : null;
+      if (currentStatus && ['running', 'pause'].includes(currentStatus)) {
         setNoticeOpen(true);
       } else {
         window.electronAPI.closeWindow(true);
@@ -67,7 +76,7 @@ const Layout = () => {
     return () => {
       window.ipcRenderer.removeAllListeners('before-close');
     };
-  }, [chatStore.tasks, chatStore.activeTaskId]);
+  }, [chatStore]);
 
   // Determine what to show based on states
   const shouldShowOnboarding =
@@ -78,6 +87,44 @@ const Layout = () => {
     initState !== 'done' ||
     installationState === 'waiting-backend';
   const shouldShowMainContent = !actualShouldShowInstallScreen;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!shouldShowOnboarding) {
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    fetch(onboardingAnimationUrl)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(
+            `Failed to load onboarding animation: ${response.status}`
+          );
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (!cancelled) {
+          setOnboardingAnimationData(data);
+        }
+      })
+      .catch((error) => {
+        console.error(
+          '[Layout] Failed to load onboarding animation, skipping it.',
+          error
+        );
+        if (!cancelled) {
+          setIsFirstLaunch(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [setIsFirstLaunch, shouldShowOnboarding]);
 
   if (!chatStore) {
     console.log(chatStore);
@@ -90,10 +137,10 @@ const Layout = () => {
       <TopBar />
       <div className="relative h-full min-h-0 flex-1 overflow-hidden">
         {/* Onboarding animation */}
-        {shouldShowOnboarding && (
+        {shouldShowOnboarding && onboardingAnimationData && (
           <AnimationJson
             onComplete={() => setIsFirstLaunch(false)}
-            animationData={animationData}
+            animationData={onboardingAnimationData}
           />
         )}
 
@@ -126,5 +173,3 @@ const Layout = () => {
 };
 
 export default Layout;
-
-

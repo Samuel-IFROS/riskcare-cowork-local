@@ -14,7 +14,18 @@ dist
 dist-ssr
 dist-electron
 release
+release-riskcare/
+release-riskcare-final-*/
 *.local
+.eigent-data/
+tmp-iexpress-test/
+full-screen-capture*.png
+renderer-capture.png
+renderer-check.png
+start-test.txt
+temp-home-module.tsx
+temp-onboarding-import.js
+temp-workflow-module.js
 
 backend/context_files/
 

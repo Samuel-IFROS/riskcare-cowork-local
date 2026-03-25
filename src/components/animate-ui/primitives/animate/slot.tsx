@@ -75,28 +75,32 @@ function mergeProps<T extends HTMLElement>(
 const Slot = React.forwardRef<HTMLElement, SlotProps>(function Slot<
   T extends HTMLElement = HTMLElement,
 >({ children, ...props }: Omit<SlotProps<T>, 'ref'>, ref: React.Ref<T>) {
+  if (!React.isValidElement(children)) return null;
+
+  const childElement = children as React.ReactElement<AnyProps> & {
+    ref?: React.Ref<T>;
+    type: React.ElementType;
+  };
+
   const isAlreadyMotion =
-    typeof children.type === 'object' &&
-    children.type !== null &&
-    isMotionComponent(children.type);
+    typeof childElement.type === 'object' &&
+    childElement.type !== null &&
+    isMotionComponent(childElement.type);
 
   const Base = React.useMemo(
     () =>
       isAlreadyMotion
-        ? (children.type as React.ElementType)
-        : motion.create(children.type as React.ElementType),
-    [isAlreadyMotion, children.type]
+        ? childElement.type
+        : motion.create(childElement.type),
+    [childElement.type, isAlreadyMotion]
   );
 
-  if (!React.isValidElement(children)) return null;
+  const mergedProps = mergeProps(childElement.props as AnyProps, props);
 
-  const { ref: childRef, ...childProps } = children.props as AnyProps;
+  const childRef =
+    typeof childElement.ref === 'string' ? undefined : childElement.ref;
 
-  const mergedProps = mergeProps(childProps, props);
-
-  return (
-    <Base {...mergedProps} ref={mergeRefs(childRef as React.Ref<T>, ref)} />
-  );
+  return <Base {...mergedProps} ref={mergeRefs(childRef, ref)} />;
 }) as <T extends HTMLElement = HTMLElement>(
   props: SlotProps<T> & { ref?: React.Ref<T> }
 ) => React.ReactElement | null;

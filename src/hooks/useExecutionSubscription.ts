@@ -123,6 +123,9 @@ export function useExecutionSubscription(enabled: boolean = true) {
   const lastCloseTimestampRef = useRef<number>(0);
   const authFailedRef = useRef<boolean>(false);
   const hasEverConnectedRef = useRef<boolean>(false);
+  const listenerCapabilityRef = useRef<
+    'unknown' | 'supported' | 'unsupported'
+  >('unknown');
   const maxReconnectAttempts = 5;
   const debounceDelay = 5000; // 5 seconds debounce period
   const baseReconnectDelay = 1000;
@@ -213,6 +216,48 @@ export function useExecutionSubscription(enabled: boolean = true) {
     return null;
   }, [hasElectronIPC]);
 
+  const probeExecutionListenerSupport = useCallback(
+    async (baseURL: string) => {
+      if (listenerCapabilityRef.current !== 'unknown') {
+        return listenerCapabilityRef.current === 'supported';
+      }
+
+      try {
+        const probeURL = new URL('/api/execution/subscribe', baseURL);
+        const response = await fetch(probeURL.toString(), {
+          method: 'GET',
+          headers: token
+            ? {
+                Authorization: `Bearer ${token}`,
+              }
+            : undefined,
+        });
+
+        const isUnsupported = [401, 403, 404].includes(response.status);
+        listenerCapabilityRef.current = isUnsupported
+          ? 'unsupported'
+          : 'supported';
+
+        if (isUnsupported) {
+          console.info(
+            `[ExecutionSubscription] Realtime listener unavailable in this installation (HTTP ${response.status})`
+          );
+          return false;
+        }
+
+        return true;
+      } catch (error) {
+        listenerCapabilityRef.current = 'unsupported';
+        console.warn(
+          '[ExecutionSubscription] Listener probe failed, disabling realtime subscription:',
+          error
+        );
+        return false;
+      }
+    },
+    [token]
+  );
+
   const connect = useCallback(async () => {
     // Prevent duplicate connections - check all non-closed states
     if (
@@ -252,10 +297,18 @@ export function useExecutionSubscription(enabled: boolean = true) {
         return;
       }
 
-      // Convert http/https to ws/wss
-      const wsProtocol = baseURL.startsWith('https') ? 'wss' : 'ws';
-      const wsURL = baseURL.replace(/^https?:\/\//, ''); // Remove protocol
-      const fullURL = `${wsProtocol}://${wsURL}/api/execution/subscribe`;
+      const listenerSupported =
+        await probeExecutionListenerSupport(baseURL);
+
+      if (!listenerSupported) {
+        authFailedRef.current = false;
+        setWsConnectionStatusRef.current('unsupported');
+        return;
+      }
+
+      const fullURL = new URL('/api/execution/subscribe', baseURL)
+        .toString()
+        .replace(/^http/, 'ws');
 
       console.log('[ExecutionSubscription] Connecting to:', fullURL);
 
@@ -277,7 +330,7 @@ export function useExecutionSubscription(enabled: boolean = true) {
         const subscribeMessage = {
           type: 'subscribe',
           session_id: sessionIdRef.current,
-          auth_token: token, // ⚠️ Remove "Bearer " prefix
+          auth_token: token,
         };
 
         ws.send(JSON.stringify(subscribeMessage));
@@ -476,7 +529,7 @@ export function useExecutionSubscription(enabled: boolean = true) {
       };
 
       ws.onerror = (error) => {
-        console.error('[ExecutionSubscription] WebSocket error:', error);
+        console.warn('[ExecutionSubscription] WebSocket error:', error);
         setWsConnectionStatusRef.current('unhealthy');
       };
 
@@ -508,6 +561,7 @@ export function useExecutionSubscription(enabled: boolean = true) {
           console.error(
             '[ExecutionSubscription] Realtime listener unavailable - not reconnecting'
           );
+          listenerCapabilityRef.current = 'unsupported';
           setWsConnectionStatusRef.current('unsupported');
           authFailedRef.current = false; // Reset flag
           return;
@@ -575,6 +629,7 @@ export function useExecutionSubscription(enabled: boolean = true) {
   }, [
     enabled,
     token,
+    probeExecutionListenerSupport,
     resolveExecutionSocketBaseURL,
     startPingInterval,
     stopPingInterval,
@@ -629,6 +684,7 @@ export function useExecutionSubscription(enabled: boolean = true) {
   const manualReconnect = useCallback(() => {
     console.log('[ExecutionSubscription] Manual reconnect triggered');
     authFailedRef.current = false;
+    listenerCapabilityRef.current = 'unknown';
     setWsConnectionStatusRef.current('connecting');
     disconnect();
     // Small delay to ensure clean disconnect

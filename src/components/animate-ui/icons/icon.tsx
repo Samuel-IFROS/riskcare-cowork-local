@@ -89,7 +89,7 @@ type DefaultIconProps<T = string> = {
 };
 
 type AnimateIconProps<T = string> = WithAsChild<
-  HTMLMotionProps<'span'> &
+  Omit<HTMLMotionProps<'span'>, 'ref'> &
     DefaultIconProps<T> & {
       children: React.ReactNode;
       asChild?: boolean;
@@ -155,7 +155,6 @@ function AnimateIcon({
   persistOnAnimateEnd = false,
   delay = 0,
   children,
-  ref: _unusedRef,
   ...props
 }: AnimateIconProps) {
   const controls = useAnimation();

@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,9 +10,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 import { CarouselStep } from '@/components/InstallStep/Carousel';
+import { LanguageStep } from '@/components/InstallStep/LanguageStep';
 import { Permissions } from '@/components/InstallStep/Permissions';
 import { ProgressInstall } from '@/components/ui/progress-install';
 import { useAuthStore } from '@/store/authStore';
@@ -64,12 +65,13 @@ export const InstallDependencies: React.FC = () => {
           </div>
         </div>
         <div className="flex h-full w-2/3 rounded-2xl bg-surface-tertiary p-md">
+          {initState === 'language' && <LanguageStep />}
           {initState === 'permissions' && <Permissions />}
-          {initState !== 'permissions' && <CarouselStep />}
+          {initState !== 'language' && initState !== 'permissions' && (
+            <CarouselStep />
+          )}
         </div>
       </div>
     </div>
   );
 };
-
-

@@ -1945,13 +1945,14 @@ async function createWindow() {
             if (authStorage) {
               // Preserve existing auth data while restoring Riskcare defaults
               const parsed = JSON.parse(authStorage);
+              const shouldPromptForLanguage = !parsed?.state?.language;
               const updatedStorage = {
                 ...parsed,
                 state: {
                   ...(parsed.state ?? {}),
                   modelType: 'cloud',
                   cloud_model_type: 'gemini-3-pro-preview',
-                  initState: 'carousel'
+                  initState: shouldPromptForLanguage ? 'language' : 'carousel'
                 }
               };
               localStorage.setItem('auth-storage', JSON.stringify(updatedStorage));
@@ -1969,7 +1970,7 @@ async function createWindow() {
                   isFirstLaunch: true,
                   modelType: 'cloud',
                   cloud_model_type: 'gemini-3-pro-preview',
-                  initState: 'carousel',
+                  initState: 'language',
                   share_token: null,
                   workerListData: {}
                 },

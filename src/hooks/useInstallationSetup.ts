@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,7 +10,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 import { useAuthStore } from '@/store/authStore';
 import { useInstallationStore } from '@/store/installationStore';
@@ -48,6 +48,37 @@ export const useInstallationSetup = () => {
     (state) => state.setNeedsBackendRestart
   );
 
+  const checkAndSetDone = useCallback(() => {
+    console.log(
+      '[useInstallationSetup] Checking readiness - Installation:',
+      installationCompleted.current,
+      'Backend:',
+      backendReady.current,
+      'InitState:',
+      initState
+    );
+
+    if (!installationCompleted.current || !backendReady.current) {
+      return;
+    }
+
+    if (initState === 'done') {
+      return;
+    }
+
+    if (initState === 'language') {
+      console.log(
+        '[useInstallationSetup] Waiting for initial language selection before entering app'
+      );
+      return;
+    }
+
+    console.log(
+      '[useInstallationSetup] Both installation and backend are ready, setting initState to done'
+    );
+    setInitState('done');
+  }, [initState, setInitState]);
+
   // Shared function to poll backend status
   const startBackendPolling = useCallback(() => {
     console.log('[useInstallationSetup] Starting backend polling');
@@ -72,8 +103,8 @@ export const useInstallationSetup = () => {
             );
             backendReady.current = true;
             setSuccess();
-            setInitState('done');
             setNeedsBackendRestart(false);
+            checkAndSetDone();
             return true; // Backend is ready, no need to poll
           }
         }
@@ -119,9 +150,9 @@ export const useInstallationSetup = () => {
               if (!backendReady.current) {
                 backendReady.current = true;
                 setSuccess();
-                setInitState('done');
                 // Clear the flag after backend is ready
                 setNeedsBackendRestart(false);
+                checkAndSetDone();
               }
             }
           }
@@ -138,7 +169,11 @@ export const useInstallationSetup = () => {
         clearInterval(pollInterval);
       }, 30000);
     });
-  }, [setSuccess, setInitState, setNeedsBackendRestart]);
+  }, [checkAndSetDone, setSuccess, setNeedsBackendRestart]);
+
+  useEffect(() => {
+    checkAndSetDone();
+  }, [checkAndSetDone]);
 
   // Monitor for backend restart after logout
   useEffect(() => {
@@ -229,22 +264,6 @@ export const useInstallationSetup = () => {
   }, []);
 
   useEffect(() => {
-    const checkAndSetDone = () => {
-      console.log(
-        '[useInstallationSetup] Checking readiness - Installation:',
-        installationCompleted.current,
-        'Backend:',
-        backendReady.current
-      );
-
-      if (installationCompleted.current && backendReady.current) {
-        console.log(
-          '[useInstallationSetup] Both installation and backend are ready, setting initState to done'
-        );
-        setInitState('done');
-      }
-    };
-
     const handleInstallStart = () => {
       installationCompleted.current = false;
       backendReady.current = false;
@@ -331,9 +350,7 @@ export const useInstallationSetup = () => {
     setSuccess,
     setError,
     setBackendError,
-    setInitState,
     setNeedsBackendRestart,
+    checkAndSetDone,
   ]);
 };
-
-

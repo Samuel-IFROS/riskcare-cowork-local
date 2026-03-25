@@ -17,7 +17,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 // type definition
-type InitState = 'permissions' | 'carousel' | 'done';
+type InitState = 'language' | 'permissions' | 'carousel' | 'done';
 type ModelType = 'cloud' | 'local' | 'custom';
 type PreferredIDE = 'vscode' | 'cursor' | 'system';
 type CloudModelType =
@@ -104,7 +104,7 @@ const authStore = create<AuthState>()(
       modelType: 'cloud',
       cloud_model_type: DEFAULT_CLOUD_MODEL,
       preferredIDE: 'system',
-      initState: 'permissions',
+      initState: 'language',
       share_token: null,
       localProxyValue: null,
       workerListData: {},

@@ -1943,12 +1943,14 @@ async function createWindow() {
           try {
             const authStorage = localStorage.getItem('auth-storage');
             if (authStorage) {
-              // Preserve existing auth data, only update initState
+              // Preserve existing auth data while restoring Riskcare defaults
               const parsed = JSON.parse(authStorage);
               const updatedStorage = {
                 ...parsed,
                 state: {
-                  ...parsed.state,
+                  ...(parsed.state ?? {}),
+                  modelType: 'cloud',
+                  cloud_model_type: 'gemini-3-pro-preview',
                   initState: 'carousel'
                 }
               };

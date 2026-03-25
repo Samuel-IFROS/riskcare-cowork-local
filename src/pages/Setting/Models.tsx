@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,7 +10,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 import {
   fetchPost,
@@ -65,11 +65,12 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 // Import model images
+import riskcareIconBlack from '@/assets/logo/icon_black.png';
+import riskcareIconWhite from '@/assets/logo/icon_white.png';
 import anthropicImage from '@/assets/model/anthropic.svg';
 import azureImage from '@/assets/model/azure.svg';
 import bedrockImage from '@/assets/model/bedrock.svg';
 import deepseekImage from '@/assets/model/deepseek.svg';
-import eigentImage from '@/assets/model/eigent.svg';
 import geminiImage from '@/assets/model/gemini.svg';
 import lmstudioImage from '@/assets/model/lmstudio.svg';
 import minimaxImage from '@/assets/model/minimax.svg';
@@ -993,12 +994,15 @@ export default function SettingModels() {
     return DARK_FILL_MODELS.has(key);
   };
 
+  const riskcareCloudImage =
+    appearance === 'dark' ? riskcareIconWhite : riskcareIconBlack;
+
   // Helper to get model image based on model ID
   const getModelImage = (modelId: string | null): string | null => {
     if (!modelId) return null;
     const modelImageMap: Record<string, string> = {
       // Cloud version
-      cloud: eigentImage,
+      cloud: riskcareCloudImage,
       // Cloud models
       openai: openaiImage,
       anthropic: anthropicImage,
@@ -1727,7 +1731,11 @@ export default function SettingModels() {
               {import.meta.env.VITE_USE_LOCAL_PROXY !== 'true' && (
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger className="gap-2">
-                    <img src={eigentImage} alt="Cloud" className="h-5 w-5" />
+                    <img
+                      src={riskcareCloudImage}
+                      alt={t('setting.eigent-cloud')}
+                      className="h-5 w-5"
+                    />
                     <span className="text-body-sm">
                       {t('setting.eigent-cloud')}
                     </span>
@@ -2003,5 +2011,3 @@ export default function SettingModels() {
     </div>
   );
 }
-
-

@@ -63,6 +63,40 @@ class LoginByGoogleRequest(BaseModel):
     invite_code: str = ""
 
 
+class LoginByOAuthRequest(BaseModel):
+    provider: str = Field(min_length=2)
+    code: str
+    code_verifier: str
+    redirect_uri: str = "http://localhost:3000/auth/callback"
+
+    @field_validator("provider")
+    @classmethod
+    def validate_provider(cls, value: str) -> str:
+        normalized = value.strip().lower()
+        aliases = {
+            "google": "google",
+            "microsoft": "azure",
+            "azure": "azure",
+        }
+        resolved = aliases.get(normalized)
+        if not resolved:
+            raise ValueError("Unsupported OAuth provider")
+        return resolved
+
+
+class MagicLinkRequest(BaseModel):
+    email: str
+    redirect_to: str = "http://localhost:3000/auth/callback"
+    create_user: bool = True
+
+    @field_validator("email")
+    @classmethod
+    def validate_magic_link_email(cls, value: str) -> str:
+        if not re.match(r"^[^@\s]+@[^@\s]+\.[^@\s]+$", value):
+            raise ValueError("Invalid email format")
+        return value
+
+
 class WorkersRequest(BaseModel):
     workers: list[dict[str, Any]] = Field(default_factory=list)
 
@@ -260,6 +294,66 @@ async def login_by_google(request: LoginByGoogleRequest):
                 local_session,
                 "Google login successful via local fallback",
             )
+        return _build_error_response(exc)
+
+
+@router.post("/login-by_oauth", name="login by oauth")
+async def login_by_oauth(request: LoginByOAuthRequest):
+    logger.info("Supabase OAuth login attempt for provider: %s", request.provider)
+    try:
+        supabase = SupabaseClient()
+        session_data = await supabase.exchange_oauth_code(
+            request.code,
+            request.code_verifier,
+            redirect_uri=request.redirect_uri,
+        )
+        return await _build_login_response(session_data, supabase)
+    except SupabaseClientError as exc:
+        logger.warning(
+            "Supabase OAuth login failed for provider %s: %s",
+            request.provider,
+            exc,
+        )
+        if _should_use_local_auth_fallback(exc):
+            local_email = f"{request.provider}_{request.code[:8]}@local.riskcare"
+            local_session = local_store.create_local_user_session(
+                local_email,
+                request.code_verifier or request.code,
+            )
+            return _build_local_auth_response(
+                local_session,
+                f"{request.provider.title()} login successful via local fallback",
+            )
+        return _build_error_response(exc)
+
+
+@router.post("/auth/magic-link", name="send auth magic link")
+async def send_magic_link(request: MagicLinkRequest):
+    logger.info("Supabase magic link requested for email: %s", request.email)
+    try:
+        supabase = SupabaseClient()
+        await supabase.send_magic_link(
+            str(request.email),
+            redirect_to=request.redirect_to,
+            create_user=request.create_user,
+        )
+        return {
+            "code": code.success,
+            "email": str(request.email),
+            "message": "Magic link sent successfully",
+        }
+    except SupabaseClientError as exc:
+        logger.warning("Supabase magic link failed: %s", exc)
+        if _should_use_local_auth_fallback(exc):
+            local_store.create_local_user_session(
+                str(request.email),
+                request.redirect_to,
+            )
+            return {
+                "code": code.success,
+                "email": str(request.email),
+                "message": "Local fallback session prepared",
+            }
         return _build_error_response(exc)
 
 

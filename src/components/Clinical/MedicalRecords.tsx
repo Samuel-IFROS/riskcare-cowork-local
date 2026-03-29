@@ -47,10 +47,8 @@ const RECORD_TYPES = [
 export function MedicalRecords(): JSX.Element {
   const {
     patients,
-    medicalRecords,
     specialists,
     addMedicalRecord,
-    updateMedicalRecord,
     deleteMedicalRecord,
     getPatientRecords,
   } = useClinicalStore();
@@ -71,6 +69,12 @@ export function MedicalRecords(): JSX.Element {
     specialistId: '',
     attachments: [],
     metadata: {},
+  });
+  const [attachmentDraft, setAttachmentDraft] = useState({
+    name: '',
+    type: '',
+    url: '',
+    size: '0',
   });
 
   const selectedPatient = selectedPatientId
@@ -126,6 +130,12 @@ export function MedicalRecords(): JSX.Element {
       attachments: [],
       metadata: {},
     });
+    setAttachmentDraft({
+      name: '',
+      type: '',
+      url: '',
+      size: '0',
+    });
     setIsDialogOpen(false);
   };
 
@@ -148,6 +158,43 @@ export function MedicalRecords(): JSX.Element {
   const getRecordTypeIcon = (type: string) => {
     const RecordIcon = RECORD_TYPES.find((t) => t.value === type)?.icon || File;
     return <RecordIcon size={16} />;
+  };
+
+  const handleAddAttachment = () => {
+    if (!attachmentDraft.name || !attachmentDraft.url) {
+      toast.error('Ingrese nombre y URL del adjunto');
+      return;
+    }
+
+    const size = Number.parseInt(attachmentDraft.size || '0', 10);
+    setFormData((current) => ({
+      ...current,
+      attachments: [
+        ...(current.attachments || []),
+        {
+          id: `attachment-${generateUniqueId()}`,
+          name: attachmentDraft.name,
+          type: attachmentDraft.type || 'archivo',
+          url: attachmentDraft.url,
+          size: Number.isFinite(size) ? size : 0,
+        },
+      ],
+    }));
+    setAttachmentDraft({
+      name: '',
+      type: '',
+      url: '',
+      size: '0',
+    });
+  };
+
+  const handleRemoveAttachment = (attachmentId: string) => {
+    setFormData((current) => ({
+      ...current,
+      attachments: (current.attachments || []).filter(
+        (attachment) => attachment.id !== attachmentId
+      ),
+    }));
   };
 
   return (
@@ -456,6 +503,99 @@ export function MedicalRecords(): JSX.Element {
                   </div>
                 )}
 
+                <div className="border-border rounded-xl border p-4">
+                  <div className="mb-3 flex items-center justify-between">
+                    <h3 className="font-medium">Adjuntos clínicos</h3>
+                    <span className="text-muted-foreground text-xs">
+                      Se sincronizan con la tabla de archivos al subir a
+                      Supabase.
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    <Input
+                      value={attachmentDraft.name}
+                      onChange={(e) =>
+                        setAttachmentDraft((current) => ({
+                          ...current,
+                          name: e.target.value,
+                        }))
+                      }
+                      placeholder="Nombre del archivo"
+                    />
+                    <Input
+                      value={attachmentDraft.type}
+                      onChange={(e) =>
+                        setAttachmentDraft((current) => ({
+                          ...current,
+                          type: e.target.value,
+                        }))
+                      }
+                      placeholder="Tipo de archivo"
+                    />
+                    <Input
+                      value={attachmentDraft.url}
+                      onChange={(e) =>
+                        setAttachmentDraft((current) => ({
+                          ...current,
+                          url: e.target.value,
+                        }))
+                      }
+                      placeholder="URL o ruta del adjunto"
+                    />
+                    <div className="flex gap-3">
+                      <Input
+                        type="number"
+                        min="0"
+                        value={attachmentDraft.size}
+                        onChange={(e) =>
+                          setAttachmentDraft((current) => ({
+                            ...current,
+                            size: e.target.value,
+                          }))
+                        }
+                        placeholder="Tamaño en bytes"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleAddAttachment}
+                      >
+                        Agregar
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 space-y-2">
+                    {(formData.attachments || []).map((attachment) => (
+                      <div
+                        key={attachment.id}
+                        className="bg-muted/30 flex items-center justify-between rounded-lg px-3 py-2"
+                      >
+                        <div className="text-sm">
+                          <p className="font-medium">{attachment.name}</p>
+                          <p className="text-muted-foreground text-xs">
+                            {attachment.type} · {attachment.url}
+                          </p>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRemoveAttachment(attachment.id)}
+                        >
+                          <Trash2 size={14} className="text-destructive" />
+                        </Button>
+                      </div>
+                    ))}
+                    {(formData.attachments || []).length === 0 && (
+                      <p className="text-muted-foreground text-sm">
+                        No hay adjuntos agregados todavía.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
                 <div className="flex justify-end gap-3 pt-4">
                   <Button type="button" variant="outline" onClick={resetForm}>
                     Cancelar
@@ -551,7 +691,17 @@ export function MedicalRecords(): JSX.Element {
                             <Paperclip size={16} />
                             <span className="text-sm">{attachment.name}</span>
                           </div>
-                          <Button variant="ghost" size="sm">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() =>
+                              window.open(
+                                attachment.url,
+                                '_blank',
+                                'noopener,noreferrer'
+                              )
+                            }
+                          >
                             <Download size={16} />
                           </Button>
                         </div>

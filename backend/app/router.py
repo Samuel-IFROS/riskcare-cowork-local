@@ -23,6 +23,7 @@ from fastapi import FastAPI
 
 from app.controller import auth_controller
 from app.controller import chat_controller
+from app.controller import clinical_controller
 from app.controller import health_controller
 from app.controller import local_compat_controller
 from app.controller import model_controller
@@ -55,6 +56,11 @@ def register_routers(app: FastAPI, prefix: str = "") -> None:
             "router": auth_controller.router,
             "tags": ["auth"],
             "description": "Authentication endpoints for login and user management",
+        },
+        {
+            "router": clinical_controller.router,
+            "tags": ["clinical"],
+            "description": "Clinical data sync endpoints backed by Supabase",
         },
         {
             "router": local_compat_controller.router,

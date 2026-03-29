@@ -352,10 +352,15 @@ function handleProtocolUrl(url: string) {
 function processProtocolUrl(url: string) {
   const urlObj = new URL(url);
   const code = urlObj.searchParams.get('code');
+  const accessToken = urlObj.searchParams.get('access_token');
+  const refreshToken = urlObj.searchParams.get('refresh_token');
+  const error = urlObj.searchParams.get('error');
+  const errorDescription = urlObj.searchParams.get('error_description');
   const share_token = urlObj.searchParams.get('share_token');
 
   log.info('urlObj', urlObj);
   log.info('code', code);
+  log.info('accessToken exists', !!accessToken);
   log.info('share_token', share_token);
 
   if (win && !win.isDestroyed()) {
@@ -373,6 +378,15 @@ function processProtocolUrl(url: string) {
     if (code) {
       log.error('protocol code:', code);
       win.webContents.send('auth-code-received', code);
+    }
+
+    if (accessToken || error) {
+      win.webContents.send('auth-session-received', {
+        accessToken,
+        refreshToken,
+        error,
+        errorDescription,
+      });
     }
 
     if (share_token) {
@@ -421,6 +435,134 @@ function sendAuthCodeToRenderer(code: string, source: string) {
   protocolUrlQueue.push(callbackUrl);
 }
 
+function sendAuthSessionToRenderer(
+  sessionPayload: {
+    accessToken?: string;
+    refreshToken?: string;
+    error?: string;
+    errorDescription?: string;
+  },
+  source: string
+) {
+  if (!sessionPayload.accessToken && !sessionPayload.error) return;
+
+  if (win && !win.isDestroyed()) {
+    log.info(`[AUTH CALLBACK] Forwarding auth session from ${source}`);
+    win.webContents.send('auth-session-received', sessionPayload);
+    return;
+  }
+
+  const params = new URLSearchParams();
+  if (sessionPayload.accessToken) {
+    params.set('access_token', sessionPayload.accessToken);
+  }
+  if (sessionPayload.refreshToken) {
+    params.set('refresh_token', sessionPayload.refreshToken);
+  }
+  if (sessionPayload.error) {
+    params.set('error', sessionPayload.error);
+  }
+  if (sessionPayload.errorDescription) {
+    params.set('error_description', sessionPayload.errorDescription);
+  }
+
+  const callbackUrl = `eigent://auth?${params.toString()}`;
+  log.info(
+    '[AUTH CALLBACK] Main window not ready, queueing auth session callback URL'
+  );
+  protocolUrlQueue.push(callbackUrl);
+}
+
+function buildAuthCallbackPage(payload: {
+  code: string;
+  error: string;
+  errorDescription: string;
+}) {
+  const encodedError = JSON.stringify(payload.error || '');
+  const encodedErrorDescription = JSON.stringify(
+    payload.errorDescription || ''
+  );
+  const encodedCode = JSON.stringify(payload.code || '');
+
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RiskCare Auth</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font-family: Arial, sans-serif;
+        background: #f6f8fc;
+        color: #10214d;
+      }
+      .card {
+        max-width: 460px;
+        margin: 24px;
+        padding: 32px;
+        border-radius: 24px;
+        background: white;
+        box-shadow: 0 18px 48px rgba(16, 33, 77, 0.12);
+        text-align: center;
+      }
+      .muted {
+        color: #5f6b88;
+        line-height: 1.6;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h2>Autenticación de RiskCare</h2>
+      <p class="muted" id="status">
+        Estamos validando tu acceso. Puedes cerrar esta pestaña cuando termine.
+      </p>
+    </div>
+    <script>
+      (() => {
+        const statusNode = document.getElementById('status');
+        const query = new URLSearchParams(window.location.search);
+        const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+        const code = ${encodedCode} || query.get('code') || '';
+        const accessToken = hash.get('access_token') || query.get('access_token') || '';
+        const refreshToken = hash.get('refresh_token') || query.get('refresh_token') || '';
+        const error = ${encodedError} || hash.get('error') || query.get('error') || '';
+        const errorDescription =
+          ${encodedErrorDescription} ||
+          hash.get('error_description') ||
+          query.get('error_description') ||
+          '';
+
+        if (error) {
+          statusNode.textContent = errorDescription || error;
+        }
+
+        if (accessToken || refreshToken || error) {
+          const params = new URLSearchParams();
+          if (accessToken) params.set('access_token', accessToken);
+          if (refreshToken) params.set('refresh_token', refreshToken);
+          if (error) params.set('error', error);
+          if (errorDescription) params.set('error_description', errorDescription);
+          window.location.replace('eigent://auth?' + params.toString());
+          return;
+        }
+
+        if (code) {
+          statusNode.textContent = 'Autenticación completada. Puedes volver a la app.';
+          return;
+        }
+
+        statusNode.textContent = 'No se recibió ninguna credencial desde el proveedor.';
+      })();
+    </script>
+  </body>
+</html>`;
+}
+
 function startLocalAuthCallbackServer() {
   if (localAuthCallbackServer) {
     return;
@@ -448,15 +590,26 @@ function startLocalAuthCallbackServer() {
         log.error(
           `[AUTH CALLBACK] OAuth error on localhost callback: ${error} ${errorDescription}`
         );
+        sendAuthSessionToRenderer(
+          {
+            error,
+            errorDescription,
+          },
+          'localhost:3000'
+        );
       } else if (code) {
         sendAuthCodeToRenderer(code, 'localhost:3000');
       } else {
-        log.warn('[AUTH CALLBACK] Callback received without code');
+        log.info('[AUTH CALLBACK] Callback waiting for browser hash data');
       }
 
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       res.end(
-        '<html><body><h3>Authentication complete.</h3><p>You can close this tab.</p></body></html>'
+        buildAuthCallbackPage({
+          code,
+          error,
+          errorDescription,
+        })
       );
     } catch (serverError) {
       log.error('[AUTH CALLBACK] Local callback server error:', serverError);

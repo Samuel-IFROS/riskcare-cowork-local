@@ -12,15 +12,27 @@
 // limitations under the License.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
-export const LOCAL_GOOGLE_AUTH_ORIGIN = 'http://localhost:3000';
-export const LOCAL_GOOGLE_AUTH_CALLBACK = `${LOCAL_GOOGLE_AUTH_ORIGIN}/auth/callback`;
+export const LOCAL_SUPABASE_AUTH_ORIGIN = 'http://localhost:3000';
+export const LOCAL_SUPABASE_AUTH_CALLBACK = `${LOCAL_SUPABASE_AUTH_ORIGIN}/auth/callback`;
+export const LOCAL_GOOGLE_AUTH_ORIGIN = LOCAL_SUPABASE_AUTH_ORIGIN;
+export const LOCAL_GOOGLE_AUTH_CALLBACK = LOCAL_SUPABASE_AUTH_CALLBACK;
 export const SUPABASE_GOOGLE_PKCE_KEY = 'supabase-google-pkce-verifier';
+export const SUPABASE_PENDING_OAUTH_KEY = 'supabase-pending-oauth-flow';
 const RISKCARE_RUNTIME_CONFIG_STORAGE_KEY = 'riskcare-runtime-config';
 const RISKCARE_RUNTIME_CONFIG_EVENT = 'riskcare-runtime-config-changed';
+
+export type SupabaseOAuthProvider = 'google' | 'azure';
 
 type SupabaseAuthConfig = {
   supabaseUrl: string;
   publishableKey: string;
+};
+
+type PendingSupabaseOAuth = {
+  provider: SupabaseOAuthProvider;
+  codeVerifier: string;
+  redirectUri: string;
+  createdAt: number;
 };
 
 type RiskcareRuntimeConfigKey =
@@ -242,6 +254,8 @@ export function buildGooglePkceVerifier(): string {
   return randomString(96);
 }
 
+export const buildOauthPkceVerifier = buildGooglePkceVerifier;
+
 export async function buildGooglePkceChallenge(
   verifier: string
 ): Promise<string> {
@@ -250,8 +264,19 @@ export async function buildGooglePkceChallenge(
   return base64UrlEncode(new Uint8Array(digest));
 }
 
-export async function buildSupabaseGoogleAuthorizeUrl(
-  codeChallenge: string
+export const buildOauthPkceChallenge = buildGooglePkceChallenge;
+
+function getProviderScopes(provider: SupabaseOAuthProvider): string | null {
+  if (provider === 'azure') {
+    return 'openid profile email';
+  }
+  return 'openid profile email';
+}
+
+export async function buildSupabaseOAuthAuthorizeUrl(
+  provider: SupabaseOAuthProvider,
+  codeChallenge: string,
+  redirectUri: string = LOCAL_SUPABASE_AUTH_CALLBACK
 ): Promise<string> {
   const config = getSupabaseAuthConfig();
   if (!config?.supabaseUrl) {
@@ -259,9 +284,67 @@ export async function buildSupabaseGoogleAuthorizeUrl(
   }
 
   const url = new URL('/auth/v1/authorize', config.supabaseUrl);
-  url.searchParams.set('provider', 'google');
-  url.searchParams.set('redirect_to', LOCAL_GOOGLE_AUTH_CALLBACK);
+  url.searchParams.set('provider', provider);
+  url.searchParams.set('redirect_to', redirectUri);
   url.searchParams.set('code_challenge', codeChallenge);
   url.searchParams.set('code_challenge_method', 'S256');
+
+  const scopes = getProviderScopes(provider);
+  if (scopes) {
+    url.searchParams.set('scopes', scopes);
+  }
+
   return url.toString();
+}
+
+export async function buildSupabaseGoogleAuthorizeUrl(
+  codeChallenge: string
+): Promise<string> {
+  return buildSupabaseOAuthAuthorizeUrl('google', codeChallenge);
+}
+
+export function setPendingSupabaseOAuth(
+  flow: PendingSupabaseOAuth | null
+): void {
+  if (!isBrowserRuntime()) {
+    return;
+  }
+
+  if (!flow) {
+    localStorage.removeItem(SUPABASE_PENDING_OAUTH_KEY);
+    localStorage.removeItem(SUPABASE_GOOGLE_PKCE_KEY);
+    return;
+  }
+
+  localStorage.setItem(SUPABASE_PENDING_OAUTH_KEY, JSON.stringify(flow));
+  if (flow.provider === 'google') {
+    localStorage.setItem(SUPABASE_GOOGLE_PKCE_KEY, flow.codeVerifier);
+  }
+}
+
+export function getPendingSupabaseOAuth(): PendingSupabaseOAuth | null {
+  if (!isBrowserRuntime()) {
+    return null;
+  }
+
+  try {
+    const raw = localStorage.getItem(SUPABASE_PENDING_OAUTH_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as PendingSupabaseOAuth;
+    if (
+      !parsed ||
+      typeof parsed.provider !== 'string' ||
+      typeof parsed.codeVerifier !== 'string' ||
+      typeof parsed.redirectUri !== 'string'
+    ) {
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+export function clearPendingSupabaseOAuth(): void {
+  setPendingSupabaseOAuth(null);
 }

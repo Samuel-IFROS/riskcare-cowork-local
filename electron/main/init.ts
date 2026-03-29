@@ -361,6 +361,10 @@ export async function startBackend(
     developmentEnvPath,
     'SUPABASE_SERVICE_ROLE_KEY'
   );
+  const devSupabaseSecretKey = readEnvValue(
+    developmentEnvPath,
+    'SUPABASE_SECRET_KEY'
+  );
   const devSupabaseWorkersTable = readEnvValue(
     developmentEnvPath,
     'SUPABASE_WORKERS_TABLE'
@@ -384,7 +388,10 @@ export async function startBackend(
   );
   const supabaseServiceRoleKey = resolveConfigValue(
     process.env.SUPABASE_SERVICE_ROLE_KEY,
+    process.env.SUPABASE_SECRET_KEY,
     readEnvValue(globalEnvPath, 'SUPABASE_SERVICE_ROLE_KEY'),
+    readEnvValue(globalEnvPath, 'SUPABASE_SECRET_KEY'),
+    devSupabaseSecretKey,
     devSupabaseServiceRoleKey
   );
   const supabaseWorkersTable = resolveConfigValue(
@@ -429,6 +436,8 @@ export async function startBackend(
       '',
     SUPABASE_SERVICE_ROLE_KEY:
       supabaseServiceRoleKey || process.env.SUPABASE_SERVICE_ROLE_KEY || '',
+    SUPABASE_SECRET_KEY:
+      supabaseServiceRoleKey || process.env.SUPABASE_SECRET_KEY || '',
     SUPABASE_WORKERS_TABLE:
       supabaseWorkersTable || process.env.SUPABASE_WORKERS_TABLE || '',
     PYTHONIOENCODING: 'utf-8',

@@ -108,7 +108,9 @@ def load_supabase_config() -> SupabaseConfig:
         or env("SUPABASE_PUBLISHABLE_KEY")
         or env("VITE_SUPABASE_PUBLISHABLE_KEY")
     )
-    service_role_key = env("SUPABASE_SERVICE_ROLE_KEY")
+    service_role_key = env("SUPABASE_SERVICE_ROLE_KEY") or env(
+        "SUPABASE_SECRET_KEY"
+    )
 
     if not url:
         raise SupabaseClientError(

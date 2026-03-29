@@ -79,46 +79,52 @@ export const useInstallationSetup = () => {
     setInitState('done');
   }, [initState, setInitState]);
 
+  const markBackendReady = useCallback(() => {
+    if (!installationCompleted.current) {
+      console.log(
+        '[useInstallationSetup] Backend health implies installation is ready enough - setting installation flag'
+      );
+      installationCompleted.current = true;
+    }
+
+    backendReady.current = true;
+    setSuccess();
+    setNeedsBackendRestart(false);
+    checkAndSetDone();
+  }, [checkAndSetDone, setNeedsBackendRestart, setSuccess]);
+
+  const probeBackendReady = useCallback(async () => {
+    try {
+      const backendPort = await window.electronAPI.getBackendPort();
+      if (!backendPort || backendPort <= 0) {
+        return false;
+      }
+
+      const response = await fetch(
+        `http://localhost:${backendPort}/health`
+      ).catch(() => null);
+      if (!response?.ok) {
+        return false;
+      }
+
+      console.log(
+        '[useInstallationSetup] Backend probe succeeded on port:',
+        backendPort
+      );
+      markBackendReady();
+      return true;
+    } catch (error) {
+      console.log('[useInstallationSetup] Backend probe failed:', error);
+      return false;
+    }
+  }, [markBackendReady]);
+
   // Shared function to poll backend status
   const startBackendPolling = useCallback(() => {
     console.log('[useInstallationSetup] Starting backend polling');
 
-    // Immediately check backend status once
-    const checkBackendStatus = async () => {
-      try {
-        const backendPort = await window.electronAPI.getBackendPort();
-        if (backendPort && backendPort > 0) {
-          console.log(
-            '[useInstallationSetup] Backend immediately detected on port:',
-            backendPort
-          );
-
-          // Verify backend is actually responding
-          const response = await fetch(
-            `http://localhost:${backendPort}/health`
-          ).catch(() => null);
-          if (response && response.ok) {
-            console.log(
-              '[useInstallationSetup] Backend health check passed immediately'
-            );
-            backendReady.current = true;
-            setSuccess();
-            setNeedsBackendRestart(false);
-            checkAndSetDone();
-            return true; // Backend is ready, no need to poll
-          }
-        }
-      } catch (error) {
-        console.log(
-          '[useInstallationSetup] Initial backend check failed:',
-          error
-        );
-      }
-      return false; // Backend not ready, need to poll
-    };
-
     // Check immediately, then start polling if needed
-    checkBackendStatus().then((isReady) => {
+    probeBackendReady().then((isReady) => {
       if (isReady) {
         console.log(
           '[useInstallationSetup] Backend already ready, skipping polling'
@@ -132,29 +138,10 @@ export const useInstallationSetup = () => {
       // This is a fallback in case the backend-ready event is missed
       const pollInterval = setInterval(async () => {
         try {
-          const backendPort = await window.electronAPI.getBackendPort();
-          if (backendPort && backendPort > 0) {
-            console.log(
-              '[useInstallationSetup] Backend poll detected ready on port:',
-              backendPort
-            );
-
-            // Verify backend is actually responding
-            const response = await fetch(
-              `http://localhost:${backendPort}/health`
-            ).catch(() => null);
-            if (response && response.ok) {
-              console.log('[useInstallationSetup] Backend health check passed');
-              clearInterval(pollInterval);
-
-              if (!backendReady.current) {
-                backendReady.current = true;
-                setSuccess();
-                // Clear the flag after backend is ready
-                setNeedsBackendRestart(false);
-                checkAndSetDone();
-              }
-            }
+          const isReadyNow = await probeBackendReady();
+          if (isReadyNow) {
+            console.log('[useInstallationSetup] Backend health check passed');
+            clearInterval(pollInterval);
           }
         } catch (error) {
           console.log(
@@ -169,7 +156,7 @@ export const useInstallationSetup = () => {
         clearInterval(pollInterval);
       }, 30000);
     });
-  }, [checkAndSetDone, setSuccess, setNeedsBackendRestart]);
+  }, [probeBackendReady]);
 
   useEffect(() => {
     checkAndSetDone();
@@ -213,10 +200,14 @@ export const useInstallationSetup = () => {
               '[useInstallationSetup] Tools already installed, waiting for backend'
             );
             installationCompleted.current = true;
-            setWaitingBackend();
-
-            // Start polling for backend when tools are already installed
-            startBackendPolling();
+            const backendReadyNow = await probeBackendReady();
+            if (!backendReadyNow) {
+              setWaitingBackend();
+              // Start polling for backend when tools are already installed
+              startBackendPolling();
+            }
+          } else {
+            await probeBackendReady();
           }
 
           if (initState !== 'done') {
@@ -234,6 +225,7 @@ export const useInstallationSetup = () => {
           '[useInstallationSetup] Tool installation check failed:',
           error
         );
+        await probeBackendReady();
         return { success: false, error };
       }
     };

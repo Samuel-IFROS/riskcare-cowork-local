@@ -62,7 +62,7 @@ export const LanguageStep = () => {
 
   const handleContinue = () => {
     switchLanguage(selectedLanguage);
-    setInitState('carousel');
+    setInitState('permissions');
   };
 
   return (

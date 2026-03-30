@@ -1,4 +1,4 @@
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,137 +10,96 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========= Copyright 2025-2026 @ eigent.ai All Rights Reserved. =========
+// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
-import { proxyFetchGet, proxyFetchPut } from '@/api/http';
-import privacy_settings from '@/assets/privacy_settings.png';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { useAuthStore } from '@/store/authStore';
-import { ArrowRight, Square, SquareCheckBig } from 'lucide-react';
-import React, { useEffect, useMemo, useState } from 'react';
+import { ArrowRight, FileCheck2, ShieldCheck } from 'lucide-react';
+import React, { useState } from 'react';
 import { Button } from '../ui/button';
 
 export const Permissions: React.FC = () => {
   const { setInitState } = useAuthStore();
-  const API_FIELDS = useMemo(
-    () => [
-      'take_screenshot',
-      'access_local_software',
-      'access_your_address',
-      'password_storage',
-    ],
-    []
-  );
-  const [settings, setSettings] = useState([
-    {
-      title: 'Enable screen recording',
-      checked: false,
-    },
-    {
-      title: 'Enable access Local Software',
-      checked: false,
-    },
-    {
-      title: 'Grant location access',
-      checked: false,
-    },
-    {
-      title: 'Share data to enhance Riskcare cowork',
-      checked: false,
-    },
-  ]);
-  useEffect(() => {
-    proxyFetchGet('/api/user/privacy')
-      .then((res) => {
-        setSettings((prev) =>
-          prev.map((item, index) => ({
-            ...item,
-            checked: res[API_FIELDS[index]] || false,
-          }))
-        );
-      })
-      .catch((err) => console.error('Failed to fetch settings:', err));
-  }, [API_FIELDS]);
-  const handleToggle = (index: number) => {
-    setSettings((prev) => {
-      const newSettings = [...prev];
-      newSettings[index] = {
-        ...newSettings[index],
-        checked: !newSettings[index].checked,
-      };
-      return newSettings;
-    });
+  const [accepted, setAccepted] = useState(false);
 
-    const requestData = {
-      [API_FIELDS[0]]: settings[0].checked,
-      [API_FIELDS[1]]: settings[1].checked,
-      [API_FIELDS[2]]: settings[2].checked,
-      [API_FIELDS[3]]: settings[3].checked,
-    };
-
-    requestData[API_FIELDS[index]] = !settings[index].checked;
-
-    proxyFetchPut('/api/user/privacy', requestData).catch((err) =>
-      console.error('Failed to update settings:', err)
-    );
-  };
   return (
-    <div className="flex h-full w-full flex-col gap-lg">
-      <div className="flex h-full w-full gap-md">
-        <div className="flex w-full flex-col gap-md">
+    <div className="flex h-full w-full flex-col justify-between gap-lg">
+      <div className="flex flex-col gap-md">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-success text-text-success">
+          <FileCheck2 className="h-6 w-6" />
+        </div>
+        <div className="flex flex-col gap-xs">
           <div className="text-heading-sm font-bold text-text-heading">
-            Enable Permissions
+            Riskcare Cowork terms and conditions
           </div>
           <div className="text-body-md font-medium text-text-body">
-            ${`Grant permission to activate the Agent's autonomous actions.`}
+            Before opening Riskcare, confirm that you accept the conditions for
+            using clinical and operational information inside the app.
           </div>
-          {settings.map((item, index) => (
-            <div
-              key={item.title}
-              onClick={() => handleToggle(index)}
-              className="flex cursor-pointer items-center gap-sm rounded-md p-xs hover:bg-fill-fill-tertiary-hover"
-            >
-              <div>
-                {item.checked ? (
-                  <SquareCheckBig size={24} className="text-icon-success" />
-                ) : (
-                  <Square size={24} className="text-icon-primary" />
-                )}
-              </div>
-              <div className="flex-1 text-xl font-medium leading-2xl text-text-body">
-                {item.title}
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="relative flex-1 rounded-3xl">
-          <img
-            className="absolute bottom-0 left-0 right-0 top-0 h-[533px] w-[899px]"
-            src={privacy_settings}
-            alt=""
-          />
         </div>
       </div>
-      <div className="flex h-full w-full items-center justify-end gap-sm">
-        <div className="flex w-full items-center justify-center gap-sm">
-          <Button
-            onClick={() => setInitState('carousel')}
-            variant="ghost"
-            size="sm"
-          >
-            skip
-          </Button>
-          <Button
-            onClick={() => setInitState('carousel')}
-            variant="primary"
-            size="sm"
-          >
-            <div>Next</div>
-            <ArrowRight size={24} className="text-white-100%" />
-          </Button>
+
+      <div className="flex flex-col gap-md">
+        <div className="rounded-2xl border border-border-tertiary bg-surface-secondary p-md">
+          <div className="mb-3 flex items-center gap-2 text-body-sm font-semibold text-text-heading">
+            <ShieldCheck className="h-4 w-4 text-text-success" />
+            Conditions of use
+          </div>
+          <div className="max-h-[290px] space-y-3 overflow-y-auto rounded-xl bg-surface-tertiary p-md text-body-sm text-text-body">
+            <p>
+              By continuing, you confirm that you are authorized to use Riskcare
+              Cowork and access the information managed from this device.
+            </p>
+            <p>
+              Clinical and patient information must only be consulted, uploaded,
+              or synchronized when the user has granted permission and you are
+              allowed to handle that data.
+            </p>
+            <p>
+              You remain responsible for reviewing important actions, validating
+              records, and complying with your privacy, confidentiality, and
+              security obligations.
+            </p>
+            <p>
+              Riskcare Cowork may deploy local services and background
+              components needed to launch the workspace correctly on this
+              computer.
+            </p>
+          </div>
         </div>
+
+        <div className="rounded-2xl border border-border-tertiary bg-surface-secondary p-md">
+          <div className="flex items-start gap-3">
+            <Checkbox
+              id="accept-riskcare-terms"
+              checked={accepted}
+              onCheckedChange={(value) => setAccepted(value === true)}
+              className="mt-1"
+            />
+            <Label
+              htmlFor="accept-riskcare-terms"
+              className="cursor-pointer text-body-sm leading-6 text-text-body"
+            >
+              I accept the Riskcare Cowork terms and conditions and understand
+              that clinical data access must always require user consent inside
+              the app.
+            </Label>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-end">
+        <Button
+          onClick={() => setInitState('carousel')}
+          variant="primary"
+          size="sm"
+          disabled={!accepted}
+        >
+          <div>Accept and continue</div>
+          <ArrowRight size={18} className="text-white-100%" />
+        </Button>
       </div>
     </div>
   );
 };
-
-

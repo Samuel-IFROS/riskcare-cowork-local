@@ -66,9 +66,9 @@ export const useInstallationSetup = () => {
       return;
     }
 
-    if (initState === 'language') {
+    if (initState === 'language' || initState === 'permissions') {
       console.log(
-        '[useInstallationSetup] Waiting for initial language selection before entering app'
+        '[useInstallationSetup] Waiting for onboarding acceptance before entering app'
       );
       return;
     }
@@ -208,15 +208,6 @@ export const useInstallationSetup = () => {
             }
           } else {
             await probeBackendReady();
-          }
-
-          if (initState !== 'done') {
-            if (!result.isInstalled && initState === 'permissions') {
-              console.log(
-                '[useInstallationSetup] Tools not installed and initState is permissions, setting to carousel'
-              );
-              setInitState('carousel');
-            }
           }
         }
         return result;

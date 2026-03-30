@@ -1,0 +1,21 @@
+Riskcare Cowork Terms and Conditions
+
+Please read these terms before installing or using Riskcare Cowork.
+
+1. Authorized use
+You confirm that you are authorized to install and use Riskcare Cowork for your organization or personal workflow.
+
+2. Clinical and operational data
+You are responsible for uploading, consulting, and processing only data that you are permitted to access and manage.
+
+3. Privacy and security
+You must protect patient, client, and operational information and comply with the privacy, confidentiality, and security rules that apply to your work.
+
+4. Responsible usage
+Riskcare Cowork assists with workflows, records, and coordination features, but you remain responsible for reviewing and validating any important action or decision.
+
+5. Local services and updates
+The installer may deploy local services, application dependencies, and updates required for Riskcare Cowork to run correctly on this device.
+
+6. Acceptance
+By continuing with the installation, you accept these Riskcare Cowork terms and conditions.

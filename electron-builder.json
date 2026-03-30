@@ -11,6 +11,8 @@
     "dist-electron",
     "dist",
     "resources",
+    "!resources/prebuilt",
+    "!resources/prebuilt/**/*",
     "!backend",
     "!dist/images",
     "!**/__pycache__",
@@ -21,7 +23,16 @@
     {
       "from": "backend",
       "to": "backend",
-      "filter": ["**/*", "!.venv/**/*", "!workspace/.initial_env/**/*"]
+      "filter": [
+        "**/*",
+        "!.venv/**/*",
+        "!workspace/.initial_env/**/*",
+        "!tests/**/*",
+        "!**/.pytest_cache/**/*",
+        "!**/.vscode/**/*",
+        "!**/__pycache__/**/*",
+        "!**/*.pyc"
+      ]
     },
     {
       "from": "resources/prebuilt",
@@ -116,6 +127,8 @@
   },
   "win": {
     "icon": "build/icon.ico",
+    "signAndEditExecutable": false,
+    "verifyUpdateCodeSignature": false,
     "artifactName": "${productName}-Setup-${version}.exe",
     "target": [
       {
@@ -134,6 +147,9 @@
     "perMachine": false,
     "allowElevation": true,
     "allowToChangeInstallationDirectory": true,
+    "displayLanguageSelector": true,
+    "multiLanguageInstaller": true,
+    "runAfterFinish": true,
     "deleteAppDataOnUninstall": false,
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,

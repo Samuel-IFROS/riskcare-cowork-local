@@ -1,0 +1,21 @@
+Terminos y Condiciones de Riskcare Cowork
+
+Lee estos terminos antes de instalar o usar Riskcare Cowork.
+
+1. Uso autorizado
+Confirmas que tienes autorizacion para instalar y usar Riskcare Cowork en tu organizacion o en tu flujo de trabajo personal.
+
+2. Datos clinicos y operativos
+Eres responsable de subir, consultar y procesar solo datos para los que tengas permiso de acceso y gestion.
+
+3. Privacidad y seguridad
+Debes proteger la informacion de pacientes, clientes y operacion, y cumplir con las reglas de privacidad, confidencialidad y seguridad aplicables a tu trabajo.
+
+4. Uso responsable
+Riskcare Cowork ayuda con flujos, expedientes y funciones de coordinacion, pero sigues siendo responsable de revisar y validar cualquier accion o decision importante.
+
+5. Servicios locales y actualizaciones
+El instalador puede desplegar servicios locales, dependencias y actualizaciones necesarias para que Riskcare Cowork funcione correctamente en este equipo.
+
+6. Aceptacion
+Al continuar con la instalacion, aceptas estos terminos y condiciones de Riskcare Cowork.

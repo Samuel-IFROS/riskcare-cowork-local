@@ -12,9 +12,9 @@
 // limitations under the License.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
-import { CarouselStep } from '@/components/InstallStep/Carousel';
 import { LanguageStep } from '@/components/InstallStep/LanguageStep';
 import { Permissions } from '@/components/InstallStep/Permissions';
+import { SetupStatusStep } from '@/components/InstallStep/SetupStatusStep';
 import { ProgressInstall } from '@/components/ui/progress-install';
 import { useAuthStore } from '@/store/authStore';
 import { useInstallationUI } from '@/store/installationStore';
@@ -68,7 +68,7 @@ export const InstallDependencies: React.FC = () => {
           {initState === 'language' && <LanguageStep />}
           {initState === 'permissions' && <Permissions />}
           {initState !== 'language' && initState !== 'permissions' && (
-            <CarouselStep />
+            <SetupStatusStep />
           )}
         </div>
       </div>
